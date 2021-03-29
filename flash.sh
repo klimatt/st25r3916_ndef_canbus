@@ -1,0 +1,1 @@
+openocd -f board/stm32l4discovery.cfg -c "program build/can_l456_nfc.bin verify reset exit 0x08000000"
