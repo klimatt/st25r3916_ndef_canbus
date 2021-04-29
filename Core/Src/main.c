@@ -530,10 +530,10 @@ int main(void)
   CAN_TxHeaderTypeDef msg;
   uint8_t data[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-  msg.StdId = 127;
+  msg.StdId = 0x01;
   msg.IDE = CAN_ID_STD;
   msg.RTR = CAN_RTR_DATA;
-  msg.DLC = 8;
+  msg.DLC = 7;
   msg.TransmitGlobalTime = DISABLE;
   
   if (HAL_CAN_Start(&hcan1) != HAL_OK) {
@@ -546,16 +546,16 @@ int main(void)
   }
   rfalNfcDevice nfcDevice;
   /* Infinite loop */
-  uint8_t id[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  uint8_t id[10] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
   while (1)
   {
     /* Run Demo Application */
     if (get_data(&id, &data))
     {
       platformLog("nfcidLen: %d \r\n", nfcDevice.nfcidLen);
-      msg.DLC = 8;
+      msg.DLC = 7;
       platformLog("CAN_State: 0x%08x \r\n", HAL_CAN_GetState(&hcan1));
-      if (can_send(&hcan1, &msg, data, &mb) != HAL_OK) {
+      if (can_send(&hcan1, &msg, id, &mb) != HAL_OK) {
         platformLog("CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
         
         
