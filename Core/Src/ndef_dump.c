@@ -130,7 +130,7 @@ ReturnCode ndefRecordDump(const ndefRecord* record, bool verbose)
 
     if (record == NULL)
     {
-        platformLog("No record\r\n");
+        SEGGER_RTT_printf(0,"No record\r\n");
         return ERR_NONE;
     }
 
@@ -148,27 +148,27 @@ ReturnCode ndefRecordDump(const ndefRecord* record, bool verbose)
         headerSR = (uint8_t*)(ndefHeaderIsSetSR(record) ? " - Short Record" : " - Standard Record");
     }
 
-    platformLog("Record #%d%s\r\n", index, headerSR);
+    SEGGER_RTT_printf(0,"Record #%d%s\r\n", index, headerSR);
 
     /* Well-known type dump */
     err = ndefRecordDumpType(record);
     if (verbose == true)
     {
         /* Raw dump */
-        //platformLog(" MB:%d ME:%d CF:%d SR:%d IL:%d TNF:%d\r\n", ndefHeaderMB(record), ndefHeaderME(record), ndefHeaderCF(record), ndefHeaderSR(record), ndefHeaderIL(record), ndefHeaderTNF(record));
-        platformLog(" MB ME CF SR IL TNF\r\n");
-        platformLog("  %d  %d  %d  %d  %d   %d\r\n", ndefHeaderMB(record), ndefHeaderME(record), ndefHeaderCF(record), ndefHeaderSR(record), ndefHeaderIL(record), ndefHeaderTNF(record));
+        //SEGGER_RTT_printf(0," MB:%d ME:%d CF:%d SR:%d IL:%d TNF:%d\r\n", ndefHeaderMB(record), ndefHeaderME(record), ndefHeaderCF(record), ndefHeaderSR(record), ndefHeaderIL(record), ndefHeaderTNF(record));
+        SEGGER_RTT_printf(0," MB ME CF SR IL TNF\r\n");
+        SEGGER_RTT_printf(0,"  %d  %d  %d  %d  %d   %d\r\n", ndefHeaderMB(record), ndefHeaderME(record), ndefHeaderCF(record), ndefHeaderSR(record), ndefHeaderIL(record), ndefHeaderTNF(record));
     }
     if ( (err != ERR_NONE) || (verbose == true) )
     {
-        platformLog(" Type Name Format: %s\r\n", ndefTNFNames[ndefHeaderTNF(record)]);
+        SEGGER_RTT_printf(0," Type Name Format: %s\r\n", ndefTNFNames[ndefHeaderTNF(record)]);
 
         uint8_t tnf;
         ndefConstBuffer8 bufRecordType;
         ndefRecordGetType(record, &tnf, &bufRecordType);
         if ( (tnf == NDEF_TNF_EMPTY) && (bufRecordType.length == 0U) )
         {
-            platformLog(" Empty NDEF record\r\n");
+            SEGGER_RTT_printf(0," Empty NDEF record\r\n");
         }
         else
         {
@@ -200,12 +200,12 @@ ReturnCode ndefMessageDump(const ndefMessage* message, bool verbose)
 
     if (message == NULL)
     {
-        platformLog("Empty NDEF message\r\n");
+        SEGGER_RTT_printf(0,"Empty NDEF message\r\n");
         return ERR_NONE;
     }
     else
     {
-        platformLog("Decoding NDEF message\r\n");
+        SEGGER_RTT_printf(0,"Decoding NDEF message\r\n");
     }
 
     record = ndefMessageGetFirstRecord(message);
@@ -237,7 +237,7 @@ ReturnCode ndefEmptyTypeDump(const ndefType* empty)
         return ERR_PARAM;
     }
 
-    platformLog(" Empty record\r\n");
+    SEGGER_RTT_printf(0," Empty record\r\n");
 
     return ERR_NONE;
 }
@@ -271,29 +271,29 @@ ReturnCode ndefRtdDeviceInfoDump(const ndefType* devInfo)
 
     ndefGetRtdDeviceInfo(devInfo, &devInfoData);
 
-    platformLog(" Device Information:\r\n");
+    SEGGER_RTT_printf(0," Device Information:\r\n");
 
     for (type = 0; type < NDEF_DEVICE_INFO_TYPE_COUNT; type++)
     {
         if (devInfoData.devInfo[type].buffer != NULL)
         {
-            platformLog(" - %s: ", ndefDeviceInfoName[devInfoData.devInfo[type].type]);
+            SEGGER_RTT_printf(0," - %s: ", ndefDeviceInfoName[devInfoData.devInfo[type].type]);
 
             if (type != NDEF_DEVICE_INFO_UUID)
             {
                 for (i = 0; i < devInfoData.devInfo[type].length; i++)
                 {
-                    platformLog("%c", devInfoData.devInfo[type].buffer[i]); /* character */
+                    SEGGER_RTT_printf(0,"%c", devInfoData.devInfo[type].buffer[i]); /* character */
                 }
             }
             else
             {
                 for (i = 0; i < devInfoData.devInfo[type].length; i++)
                 {
-                    platformLog("%.2X", devInfoData.devInfo[type].buffer[i]); /* hex number */
+                    SEGGER_RTT_printf(0,"%.2X", devInfoData.devInfo[type].buffer[i]); /* hex number */
                 }
             }
-            platformLog("\r\n");
+            SEGGER_RTT_printf(0,"\r\n");
         }
     }
 
@@ -322,7 +322,7 @@ ReturnCode ndefRtdTextDump(const ndefType* text)
 
     ndefBufferPrint(" Text: \"", &bufSentence, "");
 
-    platformLog("\" (%s,", utfEncoding == TEXT_ENCODING_UTF8 ? "UTF8" : "UTF16");
+    SEGGER_RTT_printf(0,"\" (%s,", utfEncoding == TEXT_ENCODING_UTF8 ? "UTF8" : "UTF16");
 
     ndefBuffer8Print(" language code \"", &bufLanguageCode, "\")\r\n");
 
@@ -489,7 +489,7 @@ ReturnCode ndefMediaVCardDump(const ndefType* vCard)
         return ERR_PARAM;
     }
 
-    platformLog(" vCard decoded: \r\n");
+    SEGGER_RTT_printf(0," vCard decoded: \r\n");
 
     for (i = 0; i < SIZEOF_ARRAY(bufVCardField); i++)
     {
@@ -520,7 +520,7 @@ ReturnCode ndefMediaVCardDump(const ndefType* vCard)
             }
             else
             {
-                platformLog("Photo: <Not displayed>\r\n");
+                SEGGER_RTT_printf(0,"Photo: <Not displayed>\r\n");
             }
         }
     }
@@ -546,11 +546,11 @@ ReturnCode ndefMediaWifiDump(const ndefType* wifi)
 
     ndefGetWifi(wifi, &wifiConfig);
 
-    platformLog(" Wifi config: \r\n");
+    SEGGER_RTT_printf(0," Wifi config: \r\n");
     ndefBufferDump(" Network SSID:",       &wifiConfig.bufNetworkSSID, false);
     ndefBufferDump(" Network Key:",        &wifiConfig.bufNetworkKey, false);
-    platformLog(" Authentication: %d\r\n",  wifiConfig.authentication);
-    platformLog(" Encryption: %d\r\n",      wifiConfig.encryption);
+    SEGGER_RTT_printf(0," Authentication: %d\r\n",  wifiConfig.authentication);
+    SEGGER_RTT_printf(0," Encryption: %d\r\n",      wifiConfig.encryption);
 
     return ERR_NONE;
 }
@@ -595,32 +595,32 @@ static ReturnCode ndefBufferDumpLine(const uint8_t* buffer, const uint32_t offse
         return ERR_PARAM;
     }
 
-    platformLog(" [%.4X] ", offset);
+    SEGGER_RTT_printf(0," [%.4X] ", offset);
 
     /* Dump hex data */
     for (j = 0; j < remaining; j++)
     {
-        platformLog("%.2X ", buffer[offset + j]);
+        SEGGER_RTT_printf(0,"%.2X ", buffer[offset + j]);
     }
     /* Fill hex section if needed */
     for (j = 0; j < lineLength - remaining; j++)
     {
-        platformLog("   ");
+        SEGGER_RTT_printf(0,"   ");
     }
 
     /* Dump characters */
-    platformLog("|");
+    SEGGER_RTT_printf(0,"|");
     for (j = 0; j < remaining; j++)
     {
         /* Dump only ASCII characters, otherwise replace with a '.' */
-        platformLog("%2c", isPrintableASCII(&buffer[offset + j], 1) ? buffer[offset + j] : '.');
+        SEGGER_RTT_printf(0,"%2c", isPrintableASCII(&buffer[offset + j], 1) ? buffer[offset + j] : '.');
     }
     /* Fill ASCII section if needed */
     for (j = 0; j < lineLength - remaining; j++)
     {
-        platformLog("  ");
+        SEGGER_RTT_printf(0,"  ");
     }
-    platformLog(" |\r\n");
+    SEGGER_RTT_printf(0," |\r\n");
 
     return ERR_NONE;
 }
@@ -643,10 +643,10 @@ ReturnCode ndefBufferDump(const char* string, const ndefConstBuffer* bufPayload,
     displayed = bufPayload->length;
     remaining = bufPayload->length;
 
-    platformLog("%s (length %d)\r\n", string, bufPayload->length);
+    SEGGER_RTT_printf(0,"%s (length %d)\r\n", string, bufPayload->length);
     if (bufPayload->buffer == NULL)
     {
-        platformLog(" <No chunk payload buffer>\r\n");
+        SEGGER_RTT_printf(0," <No chunk payload buffer>\r\n");
         return ERR_NONE;
     }
 
@@ -668,7 +668,7 @@ ReturnCode ndefBufferDump(const char* string, const ndefConstBuffer* bufPayload,
 
     if (displayed < bufPayload->length)
     {
-        platformLog(" ... (truncated)\r\n");
+        SEGGER_RTT_printf(0," ... (truncated)\r\n");
     }
 
     return ERR_NONE;
@@ -685,12 +685,12 @@ ReturnCode ndefBufferPrint(const char* prefix, const ndefConstBuffer* bufString,
         return ERR_PARAM;
     }
 
-    platformLog("%s", prefix);
+    SEGGER_RTT_printf(0,"%s", prefix);
     for (i = 0; i < bufString->length; i++)
     {
-        platformLog("%c", bufString->buffer[i]);
+        SEGGER_RTT_printf(0,"%c", bufString->buffer[i]);
     }
-    platformLog("%s", suffix);
+    SEGGER_RTT_printf(0,"%s", suffix);
 
     return ERR_NONE;
 }

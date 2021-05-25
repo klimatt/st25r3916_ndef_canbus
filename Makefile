@@ -70,8 +70,9 @@ Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_spi.c \
 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.c \
 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c \
 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c \
-Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_can.c 
-
+Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_can.c \
+Segger/SEGGER_RTT.c \
+Segger/SEGGER_RTT_printf.c  
 
 # ASM sources
 ASM_SOURCES =  \
@@ -144,6 +145,7 @@ C_INCLUDES =  \
 -IMiddlewares/ST/rfal/Inc \
 -IMiddlewares/ST/rfal/Src \
 -IMiddlewares/ST/rfal/Src/st25r3916 \
+-ISegger
 
 
 # compile gcc flags

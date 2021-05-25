@@ -27,6 +27,7 @@
 #include "st_errno.h"
 #include "rfal_rf.h"
 #include "rfal_analogConfig.h"
+#include "SEGGER_RTT.h"
 
 //#include "stm32l4xx_hal_can.h"
 
@@ -251,7 +252,7 @@ HAL_StatusTypeDef can_init(CAN_HandleTypeDef *hcan)
 
   //WRITE_REG(hcan->Instance->BTR, (uint32_t)0x41320009);
 
-  platformLog("BTR: 0x%08x \r\n", READ_REG(hcan->Instance->BTR));
+  SEGGER_RTT_printf(0,"BTR: 0x%08x \r\n", READ_REG(hcan->Instance->BTR));
   /* Initialize the error code */
   hcan->ErrorCode = HAL_CAN_ERROR_NONE;
 
@@ -338,7 +339,7 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
         ((tsr & CAN_TSR_TME1) != 0U) ||
         ((tsr & CAN_TSR_TME2) != 0U))
     {
-       platformLog("CAN_TSR_REG: 0x%08x \r\n", tsr);
+       SEGGER_RTT_printf(0,"CAN_TSR_REG: 0x%08x \r\n", tsr);
       /* Select an empty transmit mailbox */
       transmitmailbox = (tsr & CAN_TSR_CODE) >> CAN_TSR_CODE_Pos;
 
@@ -390,10 +391,10 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
 
       /* Request transmission */
       SET_BIT(hcan->Instance->sTxMailBox[transmitmailbox].TIR, CAN_TI0R_TXRQ);
-      platformLog("CAN_SEND rqTX\r\n");
-      platformLog("TDHR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TDHR));
-      platformLog("TDLR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TDLR));
-      platformLog("TIR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TIR));
+      SEGGER_RTT_printf(0,"CAN_SEND rqTX\r\n");
+      SEGGER_RTT_printf(0,"TDHR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TDHR));
+      SEGGER_RTT_printf(0,"TDLR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TDLR));
+      SEGGER_RTT_printf(0,"TIR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TIR));
       /* Return function status */
       return HAL_OK;
     }
@@ -427,6 +428,34 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
   * @return None
   *****************************************************************************
   */
+
+
+//#define NFC_TL
+//#define NFC_TR 
+//#define NFC_BL 
+#define NFC_BR
+
+#ifdef NFC_TL
+  uint32_t CAN_ID = 0x1000a00a;
+#endif
+
+#ifdef NFC_TR
+  uint32_t CAN_ID = 0x1000a10a;
+#endif
+
+#ifdef NFC_BL
+  uint32_t CAN_ID = 0x1000a20a;
+#endif
+
+#ifdef NFC_BR
+  uint32_t CAN_ID = 0x1000a30a;
+#endif
+
+#define ERROR_LED GPIO_PIN_3
+#define STATE_LED GPIO_PIN_4
+#define LEDS_PORT GPIOA
+const uint32_t CNT_LIMIT = 8000000;
+
 int main(void)
 {
   /* STM32L4xx HAL library initialization:
@@ -438,17 +467,30 @@ int main(void)
              handled in milliseconds basis.
        - Low Level Initialization
      */
+  SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
   HAL_Init();
 
   /* Configure the System clock to have a frequency of 80 MHz */
   SystemClock_Config();
 
    //gpio_can_init();
-   logUsartInit(&hlogger);
+   //logUsartInit(&hlogger);
   MX_CAN1_Init();
 
-  NFC06A1_LED_Init();
-  BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
+  //NFC06A1_LED_Init();
+
+  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitStruct.Pin = ERROR_LED | STATE_LED;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(LEDS_PORT, &GPIO_InitStruct);
+  
+  /* Configure Led pin Output Level as off */
+  HAL_GPIO_WritePin(LEDS_PORT, ERROR_LED, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_RESET);
+
+  //BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
 #ifdef RFAL_USE_I2C
   BSP_I2C1_Init();
 #else
@@ -457,7 +499,7 @@ int main(void)
   /* Initialize log module */
   
   
-  platformLog("Welcome to X-NUCLEO-NFC06A1 + CAN-Bus\r\n");
+  SEGGER_RTT_printf(0,"Welcome to X-NUCLEO-NFC06A1 + CAN-Bus\r\n");
   
   //MX_GPIO_Init();
  
@@ -470,99 +512,79 @@ int main(void)
     * in case the rfal initalization failed signal it by flashing all LED
     * and stoping all operations
     */
-    platformLog("Initialization failed..\r\n");
-    while(1) 
-    {
-      NFC06A1_LED_Toggle( TX_LED );
-      NFC06A1_LED_Toggle( TA_LED );
-      NFC06A1_LED_Toggle( TB_LED );
-      NFC06A1_LED_Toggle( TF_LED );
-      NFC06A1_LED_Toggle( TV_LED );
-      NFC06A1_LED_Toggle( AP2P_LED );
-      platformDelay(100);
-    }
+    SEGGER_RTT_printf(0,"Initialization failed..\r\n");
+    Error_Handler();
   } 
   else
   {
-    platformLog("Initialization succeeded..\r\n");
-    for (int i = 0; i < 6; i++) 
-    {
-      NFC06A1_LED_Toggle( TX_LED );
-      NFC06A1_LED_Toggle( TA_LED );
-      NFC06A1_LED_Toggle( TB_LED );
-      NFC06A1_LED_Toggle( TF_LED );
-      NFC06A1_LED_Toggle( TV_LED );
-      NFC06A1_LED_Toggle( AP2P_LED );
-      platformDelay(200);
-    }
-    
-    NFC06A1_LED_OFF( TA_LED );
-    NFC06A1_LED_OFF( TB_LED );
-    NFC06A1_LED_OFF( TF_LED );
-    NFC06A1_LED_OFF( TV_LED );
-    NFC06A1_LED_OFF( AP2P_LED );
-    NFC06A1_LED_OFF( TX_LED );
+    SEGGER_RTT_printf(0,"Initialization succeeded..\r\n");
+    HAL_GPIO_TogglePin(LEDS_PORT, ERROR_LED);
+    HAL_GPIO_TogglePin(LEDS_PORT, STATE_LED);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LEDS_PORT, ERROR_LED, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_RESET);
   }
 
-  /*CAN_FilterTypeDef sf;
-  sf.FilterMaskIdHigh = 0x0000;
-  sf.FilterMaskIdLow = 0x0000;
+  CAN_FilterTypeDef sf;
+  sf.FilterMaskIdHigh = (uint16_t)(CAN_ID >> 16);
+  sf.FilterMaskIdLow = (uint16_t)(CAN_ID);
   sf.FilterFIFOAssignment = CAN_FILTER_FIFO0;
   sf.FilterBank = 0;
-  sf.FilterMode = CAN_FILTERMODE_IDMASK;
+  sf.FilterMode = CAN_FILTERMODE_IDLIST;
   sf.FilterScale = CAN_FILTERSCALE_32BIT;
   sf.FilterActivation = CAN_FILTER_ENABLE;
   if (HAL_CAN_ConfigFilter(&hcan1, &sf) != HAL_OK) {
-    platformLog("CAN_Filter config Fail: 0x%08x \r\n", hcan1.ErrorCode);
-    Error_Handler();
-  }*/
-
-  /*if (HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can_irq)) {
-    Error_Handler();
-  }*/
-
-  if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
+    SEGGER_RTT_printf(0,"CAN_Filter config Fail: 0x%08x \r\n", hcan1.ErrorCode);
     Error_Handler();
   }
 
+  /*if (HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can_irq)) {
+    Error_Handler();
+  }
+
+  if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
+    Error_Handler();
+  }*/
 
   uint32_t mb;
   CAN_TxHeaderTypeDef msg;
   uint8_t data[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-  msg.StdId = 0x01;
-  msg.IDE = CAN_ID_STD;
+  
+  msg.IDE = CAN_ID_EXT;
   msg.RTR = CAN_RTR_DATA;
-  msg.DLC = 7;
+  //msg.DLC = 7;
   msg.TransmitGlobalTime = DISABLE;
+
+  uint32_t counter = 0;
+
   
   if (HAL_CAN_Start(&hcan1) != HAL_OK) {
-    platformLog("CAN_Start Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    SEGGER_RTT_printf(0,"CAN_Start Fail: 0x%08x \r\n", hcan1.ErrorCode);
      Error_Handler();
   }
   if (HAL_CAN_WakeUp (&hcan1) != HAL_OK) {
-    platformLog("CAN_Wakeup Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    SEGGER_RTT_printf(0,"CAN_Wakeup Fail: 0x%08x \r\n", hcan1.ErrorCode);
      Error_Handler();
   }
   rfalNfcDevice nfcDevice;
   /* Infinite loop */
   uint8_t id[10] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
   while (1)
-  {
-    /* Run Demo Application */
-    if (get_data(&id, &data))
+  { 
+   if (get_data(&id, &data))
     {
-      platformLog("nfcidLen: %d \r\n", nfcDevice.nfcidLen);
+      counter = 0;
+      HAL_GPIO_TogglePin(LEDS_PORT, STATE_LED);
+      SEGGER_RTT_printf(0,"nfcidLen: %d \r\n", nfcDevice.nfcidLen);
+      msg.ExtId = CAN_ID;
       msg.DLC = 7;
-      platformLog("CAN_State: 0x%08x \r\n", HAL_CAN_GetState(&hcan1));
+      SEGGER_RTT_printf(0,"CAN_State: 0x%08x \r\n", HAL_CAN_GetState(&hcan1));
       if (can_send(&hcan1, &msg, id, &mb) != HAL_OK) {
-        platformLog("CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
-        
-        
-          Error_Handler();
+        SEGGER_RTT_printf(0,"CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
+          //Error_Handler();
       }
     }
-    //HAL_Delay(1000);
   }
 }
 
@@ -581,6 +603,8 @@ void _Error_Handler(char * file, int line)
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
   {
+    HAL_GPIO_TogglePin(LEDS_PORT, ERROR_LED);
+    HAL_Delay(500);
   }
   /* USER CODE END Error_Handler_Debug */ 
 }
@@ -597,19 +621,19 @@ static void MX_CAN1_Init(void)
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
   hcan1.Init.Prescaler = 5;
-  hcan1.Init.Mode = CAN_MODE_LOOPBACK;
+  hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = 1;
   hcan1.Init.TimeSeg1 = 2;
   hcan1.Init.TimeSeg2 = 3;
   hcan1.Init.TimeTriggeredMode = DISABLE;
-  hcan1.Init.AutoBusOff = DISABLE;
+  hcan1.Init.AutoBusOff = ENABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
   hcan1.Init.AutoRetransmission = ENABLE;
   hcan1.Init.ReceiveFifoLocked = DISABLE;
   hcan1.Init.TransmitFifoPriority = DISABLE;
   if (can_init(&hcan1) != HAL_OK)
   {
-    platformLog("CAN_INIT Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    SEGGER_RTT_printf(0,"CAN_INIT Fail: 0x%08x \r\n", hcan1.ErrorCode);
     Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
@@ -628,11 +652,11 @@ static void gpio_can_init()
     /* Peripheral clock enable */
     //__HAL_RCC_CAN1_CLK_ENABLE();
 
-                                                 __IO uint32_t tmpreg; 
-                                                 SET_BIT(RCC->APB1ENR1, RCC_APB1ENR1_CAN1EN); 
-                                                 /* Delay after an RCC peripheral clock enabling */ 
-                                                 tmpreg = READ_BIT(RCC->APB1ENR1, RCC_APB1ENR1_CAN1EN); 
-                                                 UNUSED(tmpreg); 
+     __IO uint32_t tmpreg; 
+     SET_BIT(RCC->APB1ENR1, RCC_APB1ENR1_CAN1EN); 
+     //Delay after an RCC peripheral clock enabling  
+     tmpreg = READ_BIT(RCC->APB1ENR1, RCC_APB1ENR1_CAN1EN); 
+     UNUSED(tmpreg); 
                                          
 
 
@@ -657,10 +681,10 @@ static void gpio_can_init()
 
 
     /* CAN1 interrupt Init */
-    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 0, 0);
+    /*HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
     HAL_NVIC_SetPriority(CAN1_RX1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
+    HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);*/
   /* USER CODE BEGIN CAN1_MspInit 1 */
 
   /* USER CODE END CAN1_MspInit 1 */

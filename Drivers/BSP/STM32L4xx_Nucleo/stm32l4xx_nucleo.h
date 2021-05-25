@@ -239,10 +239,10 @@ typedef enum
 /**
   * @brief  LCD Control Interface pins
   */
-#define LCD_CS_PIN                                 GPIO_PIN_11
+/*#define LCD_CS_PIN                                 GPIO_PIN_11
 #define LCD_CS_GPIO_PORT                           GPIOA
 #define LCD_CS_GPIO_CLK_ENABLE()                   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE()
+#define LCD_CS_GPIO_CLK_DISABLE()                  __HAL_RCC_GPIOA_CLK_DISABLE()*/
 
 /**
   * @brief  LCD Data/Command Interface pins

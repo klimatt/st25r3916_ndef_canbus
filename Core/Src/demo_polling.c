@@ -174,11 +174,11 @@ static void demoNotif( rfalNfcState st )
     
     if( st == RFAL_NFC_STATE_WAKEUP_MODE )
     {
-        platformLog("Wake Up mode started \r\n");
+        SEGGER_RTT_printf(0,"Wake Up mode started \r\n");
     }
     else if( st == RFAL_NFC_STATE_POLL_TECHDETECT )
     {
-        platformLog("Wake Up mode terminated. Polling for devices \r\n");
+        SEGGER_RTT_printf(0,"Wake Up mode terminated. Polling for devices \r\n");
     }
     else if( st == RFAL_NFC_STATE_POLL_SELECT )
     {
@@ -186,7 +186,7 @@ static void demoNotif( rfalNfcState st )
         rfalNfcGetDevicesFound( &dev, &devCnt );
         rfalNfcSelect( 0 );
         
-        platformLog("Multiple Tags detected: %d \r\n", devCnt);
+        SEGGER_RTT_printf(0,"Multiple Tags detected: %d \r\n", devCnt);
     }
 }
 
@@ -307,7 +307,7 @@ void demoCycle( void )
     {
         discParam.wakeupEnabled = !discParam.wakeupEnabled;    /* enable/disable wakeup */
         state = DEMO_ST_START_DISCOVERY;                       /* restart loop          */
-        platformLog("Toggling Wake Up mode %s\r\n", discParam.wakeupEnabled ? "ON": "OFF");
+        SEGGER_RTT_printf(0,"Toggling Wake Up mode %s\r\n", discParam.wakeupEnabled ? "ON": "OFF");
 
         /* Debounce button */
         while( platformGpioIsLow(PLATFORM_USER_BUTTON_PORT, PLATFORM_USER_BUTTON_PIN) );
@@ -348,24 +348,24 @@ void demoCycle( void )
                         switch( nfcDevice->dev.nfca.type )
                         {
                             case RFAL_NFCA_T1T:
-                                platformLog("ISO14443A/Topaz (NFC-A T1T) TAG found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+                                SEGGER_RTT_printf(0,"ISO14443A/Topaz (NFC-A T1T) TAG found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
                                 break;
                             
                             case RFAL_NFCA_T4T:
-                                platformLog("NFCA Passive ISO-DEP device found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+                                SEGGER_RTT_printf(0,"NFCA Passive ISO-DEP device found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
                             
                                 demoAPDU();
                                 break;
                             
                             case RFAL_NFCA_T4T_NFCDEP:
                             case RFAL_NFCA_NFCDEP:
-                                platformLog("NFCA Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+                                SEGGER_RTT_printf(0,"NFCA Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
                                 
                                 demoP2P( nfcDevice );
                                 break;
                                 
                             default:
-                                platformLog("ISO14443A/NFC-A card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+                                SEGGER_RTT_printf(0,"ISO14443A/NFC-A card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
                                 break;
                         }
                         break;
@@ -373,7 +373,7 @@ void demoCycle( void )
                     /*******************************************************************************/
                     case RFAL_NFC_LISTEN_TYPE_NFCB:
                         
-                        platformLog("ISO14443B/NFC-B card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+                        SEGGER_RTT_printf(0,"ISO14443B/NFC-B card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
                         platformLedOn(PLATFORM_LED_B_PORT, PLATFORM_LED_B_PIN);
                     
                         if( rfalNfcbIsIsoDepSupported( &nfcDevice->dev.nfcb ) )
@@ -387,12 +387,12 @@ void demoCycle( void )
                         
                         if( rfalNfcfIsNfcDepSupported( &nfcDevice->dev.nfcf ) )
                         {
-                            platformLog("NFCF Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+                            SEGGER_RTT_printf(0,"NFCF Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
                             demoP2P( nfcDevice );
                         }
                         else
                         {
-                            platformLog("Felica/NFC-F card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
+                            SEGGER_RTT_printf(0,"Felica/NFC-F card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
                             
                             demoNfcf( &nfcDevice->dev.nfcf );
                         }
@@ -407,7 +407,7 @@ void demoCycle( void )
                             
                             ST_MEMCPY( devUID, nfcDevice->nfcid, nfcDevice->nfcidLen );   /* Copy the UID into local var */
                             REVERSE_BYTES( devUID, RFAL_NFCV_UID_LEN );                 /* Reverse the UID for display purposes */
-                            platformLog("ISO15693/NFC-V card found. UID: %s\r\n", hex2Str(devUID, RFAL_NFCV_UID_LEN));
+                            SEGGER_RTT_printf(0,"ISO15693/NFC-V card found. UID: %s\r\n", hex2Str(devUID, RFAL_NFCV_UID_LEN));
                         
                             platformLedOn(PLATFORM_LED_V_PORT, PLATFORM_LED_V_PIN);
                             
@@ -418,7 +418,7 @@ void demoCycle( void )
                     /*******************************************************************************/
                     case RFAL_NFC_LISTEN_TYPE_ST25TB:
                         
-                        platformLog("ST25TB card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
+                        SEGGER_RTT_printf(0,"ST25TB card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
                         platformLedOn(PLATFORM_LED_B_PORT, PLATFORM_LED_B_PIN);
                         break;
                     
@@ -426,7 +426,7 @@ void demoCycle( void )
                     case RFAL_NFC_LISTEN_TYPE_AP2P:
                     case RFAL_NFC_POLL_TYPE_AP2P:
                         
-                        platformLog("NFC Active P2P device found. NFCID3: %s\r\n", hex2Str(nfcDevice->nfcid, nfcDevice->nfcidLen));
+                        SEGGER_RTT_printf(0,"NFC Active P2P device found. NFCID3: %s\r\n", hex2Str(nfcDevice->nfcid, nfcDevice->nfcidLen));
                         platformLedOn(PLATFORM_LED_AP2P_PORT, PLATFORM_LED_AP2P_PIN);
                     
                         demoP2P( nfcDevice );
@@ -436,7 +436,7 @@ void demoCycle( void )
                     case RFAL_NFC_POLL_TYPE_NFCA:
                     case RFAL_NFC_POLL_TYPE_NFCF:
                         
-                        platformLog("Activated in CE %s mode.\r\n", (nfcDevice->type == RFAL_NFC_POLL_TYPE_NFCA) ? "NFC-A" : "NFC-F");
+                        SEGGER_RTT_printf(0,"Activated in CE %s mode.\r\n", (nfcDevice->type == RFAL_NFC_POLL_TYPE_NFCA) ? "NFC-A" : "NFC-F");
                         platformLedOn( ((nfcDevice->type == RFAL_NFC_POLL_TYPE_NFCA) ? PLATFORM_LED_A_PORT : PLATFORM_LED_F_PORT), 
                                        ((nfcDevice->type == RFAL_NFC_POLL_TYPE_NFCA) ? PLATFORM_LED_A_PIN  : PLATFORM_LED_F_PIN)  );
                     
@@ -547,13 +547,13 @@ static void demoNfcf( rfalNfcfListenDevice *nfcfDev )
     bl[0].blockNum = 0x0001;                            /* Block: NDEF Data                      */
     
     err = rfalNfcfPollerCheck( nfcfDev->sensfRes.NFCID2, &servBlock, buf, sizeof(buf), &rcvLen);
-    platformLog(" Check Block: %s Data:  %s \r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( &buf[1], RFAL_NFCF_BLOCK_LEN) );
+    SEGGER_RTT_printf(0," Check Block: %s Data:  %s \r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( &buf[1], RFAL_NFCF_BLOCK_LEN) );
     
     #if 0  /* Writing example */
         err = rfalNfcfPollerUpdate( nfcfDev->sensfRes.NFCID2, &servBlock, buf , sizeof(buf), wrData, buf, sizeof(buf) );
-        platformLog(" Update Block: %s Data: %s \r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( wrData, RFAL_NFCF_BLOCK_LEN) );
+        SEGGER_RTT_printf(0," Update Block: %s Data: %s \r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( wrData, RFAL_NFCF_BLOCK_LEN) );
         err = rfalNfcfPollerCheck( nfcfDev->sensfRes.NFCID2, &servBlock, buf, sizeof(buf), &rcvLen);
-        platformLog(" Check Block:  %s Data: %s \r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( &buf[1], RFAL_NFCF_BLOCK_LEN) );
+        SEGGER_RTT_printf(0," Check Block:  %s Data: %s \r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( &buf[1], RFAL_NFCF_BLOCK_LEN) );
     #endif
     
 #endif /* RFAL_FEATURE_NFCF */
@@ -591,7 +591,7 @@ static void demoNfcv( rfalNfcvListenDevice *nfcvDev )
         * Activate selected state
         */
         err = rfalNfcvPollerSelect( reqFlag, nfcvDev->InvRes.UID );
-        platformLog(" Select %s \r\n", (err != ERR_NONE) ? "FAIL (revert to addressed mode)": "OK" );
+        SEGGER_RTT_printf(0," Select %s \r\n", (err != ERR_NONE) ? "FAIL (revert to addressed mode)": "OK" );
         if( err == ERR_NONE )
         {
             reqFlag = (RFAL_NFCV_REQ_FLAG_DEFAULT | RFAL_NFCV_REQ_FLAG_SELECT);
@@ -604,13 +604,13 @@ static void demoNfcv( rfalNfcvListenDevice *nfcvDev )
     * with addressed mode (uid != NULL) or selected mode (uid == NULL)
     */
     err = rfalNfcvPollerReadSingleBlock(reqFlag, uid, blockNum, rxBuf, sizeof(rxBuf), &rcvLen);
-    platformLog(" Read Block: %s %s\r\n", (err != ERR_NONE) ? "FAIL": "OK Data:", (err != ERR_NONE) ? "" : hex2Str( &rxBuf[1], DEMO_NFCV_BLOCK_LEN));
+    SEGGER_RTT_printf(0," Read Block: %s %s\r\n", (err != ERR_NONE) ? "FAIL": "OK Data:", (err != ERR_NONE) ? "" : hex2Str( &rxBuf[1], DEMO_NFCV_BLOCK_LEN));
  
     #if DEMO_NFCV_WRITE_TAG /* Writing example */
         err = rfalNfcvPollerWriteSingleBlock(reqFlag, uid, blockNum, wrData, sizeof(wrData));
-        platformLog(" Write Block: %s Data: %s\r\n", (err != ERR_NONE) ? "FAIL": "OK", hex2Str( wrData, DEMO_NFCV_BLOCK_LEN) );
+        SEGGER_RTT_printf(0," Write Block: %s Data: %s\r\n", (err != ERR_NONE) ? "FAIL": "OK", hex2Str( wrData, DEMO_NFCV_BLOCK_LEN) );
         err = rfalNfcvPollerReadSingleBlock(reqFlag, uid, blockNum, rxBuf, sizeof(rxBuf), &rcvLen);
-        platformLog(" Read Block: %s %s\r\n", (err != ERR_NONE) ? "FAIL": "OK Data:", (err != ERR_NONE) ? "" : hex2Str( &rxBuf[1], DEMO_NFCV_BLOCK_LEN));
+        SEGGER_RTT_printf(0," Read Block: %s %s\r\n", (err != ERR_NONE) ? "FAIL": "OK Data:", (err != ERR_NONE) ? "" : hex2Str( &rxBuf[1], DEMO_NFCV_BLOCK_LEN));
     #endif /* DEMO_NFCV_WRITE_TAG */
         
 #endif /* RFAL_FEATURE_NFCV */        
@@ -646,33 +646,33 @@ void demoP2P( rfalNfcDevice *nfcDev )
         /* Initiator request is being ignored/discarded  */
     }
 
-    platformLog(" Initialize device .. ");
+    SEGGER_RTT_printf(0," Initialize device .. ");
     err = demoTransceiveBlocking( ndefInit, sizeof(ndefInit), &rxData, &rxLen, RFAL_FWT_NONE);
     if( err != ERR_NONE )
     {
-        platformLog("failed.\r\n");
+        SEGGER_RTT_printf(0,"failed.\r\n");
         return;
     }
-    platformLog("succeeded.\r\n");
+    SEGGER_RTT_printf(0,"succeeded.\r\n");
 
-    platformLog(" Push NDEF Uri: www.st.com .. ");
+    SEGGER_RTT_printf(0," Push NDEF Uri: www.st.com .. ");
     err = demoTransceiveBlocking( ndefUriSTcom, sizeof(ndefUriSTcom), &rxData, &rxLen, RFAL_FWT_NONE);
     if( err != ERR_NONE )
     {
-        platformLog("failed.\r\n");
+        SEGGER_RTT_printf(0,"failed.\r\n");
         return;
     }
-    platformLog("succeeded.\r\n");
+    SEGGER_RTT_printf(0,"succeeded.\r\n");
 
 
-    platformLog(" Device present, maintaining connection ");
+    SEGGER_RTT_printf(0," Device present, maintaining connection ");
     while(err == ERR_NONE) 
     {
         err = demoTransceiveBlocking( ndefLLCPSYMM, sizeof(ndefLLCPSYMM), &rxData, &rxLen, RFAL_FWT_NONE);
-        platformLog(".");
+        SEGGER_RTT_printf(0,".");
         platformDelay(50);
     }
-    platformLog("\r\n Device removed.\r\n");
+    SEGGER_RTT_printf(0,"\r\n Device removed.\r\n");
     
 #endif /* RFAL_FEATURE_NFC_DEP */
 }
@@ -697,17 +697,17 @@ void demoAPDU( void )
 
     /* Exchange APDU: NDEF Tag Application Select command */
     err = demoTransceiveBlocking( ndefSelectApp, sizeof(ndefSelectApp), &rxData, &rxLen, RFAL_FWT_NONE );
-    platformLog(" Select NDEF Application: %s Data: %s\r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( rxData, *rxLen) );
+    SEGGER_RTT_printf(0," Select NDEF Application: %s Data: %s\r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( rxData, *rxLen) );
 
     if( (err == ERR_NONE) && rxData[0] == 0x90 && rxData[1] == 0x00)
     {
         /* Exchange APDU: Select Capability Container File */
         err = demoTransceiveBlocking( ccSelectFile, sizeof(ccSelectFile), &rxData, &rxLen, RFAL_FWT_NONE );
-        platformLog(" Select CC: %s Data: %s\r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( rxData, *rxLen) );
+        SEGGER_RTT_printf(0," Select CC: %s Data: %s\r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( rxData, *rxLen) );
 
         /* Exchange APDU: Read Capability Container File  */
         err = demoTransceiveBlocking( readBynary, sizeof(readBynary), &rxData, &rxLen, RFAL_FWT_NONE );
-        platformLog(" Read CC: %s Data: %s\r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( rxData, *rxLen) );
+        SEGGER_RTT_printf(0," Read CC: %s Data: %s\r\n", (err != ERR_NONE) ? "FAIL": "OK", (err != ERR_NONE) ? "" : hex2Str( rxData, *rxLen) );
     }
     
 #endif /* RFAL_FEATURE_ISO_DEP_POLL */

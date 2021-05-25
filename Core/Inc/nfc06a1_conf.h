@@ -57,7 +57,7 @@
 #define NFC06A1_LED4_PIN_CLK_DISABLE()    __HAL_RCC_GPIOC_CLK_DISABLE();
 #define NFC06A1_LED5_PIN_CLK_DISABLE()    __HAL_RCC_GPIOC_CLK_DISABLE();
 #define NFC06A1_LED6_PIN_CLK_DISABLE()    __HAL_RCC_GPIOA_CLK_DISABLE();
-#define NFC06A1_LED1_PIN                  GPIO_PIN_1
+/*#define NFC06A1_LED1_PIN                  GPIO_PIN_1
 #define NFC06A1_LED1_PIN_PORT             GPIOA
 #define NFC06A1_LED2_PIN                  GPIO_PIN_4
 #define NFC06A1_LED2_PIN_PORT             GPIOA
@@ -69,6 +69,20 @@
 #define NFC06A1_LED5_PIN_PORT             GPIOC
 #define NFC06A1_LED6_PIN                  GPIO_PIN_8
 #define NFC06A1_LED6_PIN_PORT             GPIOA
+*/
+#define NFC06A1_LED1_PIN                  GPIO_PIN_15
+#define NFC06A1_LED1_PIN_PORT             GPIOA
+#define NFC06A1_LED2_PIN                  GPIO_PIN_15
+#define NFC06A1_LED2_PIN_PORT             GPIOA
+#define NFC06A1_LED3_PIN                  GPIO_PIN_15
+#define NFC06A1_LED3_PIN_PORT             GPIOA
+#define NFC06A1_LED4_PIN                  GPIO_PIN_15
+#define NFC06A1_LED4_PIN_PORT             GPIOA
+#define NFC06A1_LED5_PIN                  GPIO_PIN_15
+#define NFC06A1_LED5_PIN_PORT             GPIOA
+#define NFC06A1_LED6_PIN                  GPIO_PIN_15
+#define NFC06A1_LED6_PIN_PORT             GPIOA
+
 #if 0 /* Code not compiled, reserved for Doxygen */
 /**
   * @}

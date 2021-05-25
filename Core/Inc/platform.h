@@ -165,7 +165,7 @@ extern "C" {
 #define platformI2CSlaveAddrWR(add)                                                                 /*!< I2C Slave address for Write operation       */
 #define platformI2CSlaveAddrRD(add)                                                                 /*!< I2C Slave address for Read operation        */
 
-#define platformLog(...)                              logUsart(__VA_ARGS__)                         /*!< Log  method                                 */
+//#define platformLog(...)                              logUsart(__VA_ARGS__)                         /*!< Log  method                                 */
 
 /**
   * @}

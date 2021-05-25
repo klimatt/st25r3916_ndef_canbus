@@ -67,11 +67,11 @@ void HAL_MspInit(void)
   __HAL_RCC_GPIOH_CLK_ENABLE();
 
   /* Configure all GPIO port pins in Analog Input mode (floating input trigger OFF) except debug pins */
-  GPIO_InitStruct.Pin = GPIO_PIN_All & (!(GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_11|GPIO_PIN_12));
+  /*GPIO_InitStruct.Pin = GPIO_PIN_All & (!(GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_11|GPIO_PIN_12));
   
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);*/
   GPIO_InitStruct.Pin = GPIO_PIN_All & (!(GPIO_PIN_3));
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
   GPIO_InitStruct.Pin = GPIO_PIN_All;
@@ -211,8 +211,9 @@ void SystemClock_Config(void)
   __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
   
   /* Initializes the CPU, AHB and APB busses clocks */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSE|RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+  RCC_OscInitStruct.LSEState = RCC_LSE_OFF;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_11;
