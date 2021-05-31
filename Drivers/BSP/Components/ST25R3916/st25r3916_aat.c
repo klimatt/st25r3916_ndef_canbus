@@ -57,7 +57,7 @@
 * GLOBAL MACROS
 ******************************************************************************
 */
-#define st25r3916AatLog(...)     /* SEGGER_RTT_printf(0,__VA_ARGS__) */   /*!< Logging macro */
+#define st25r3916AatLog(...)     /* //SEGGER_RTT_printf(0,__VA_ARGS__) */   /*!< Logging macro */
 
 /*
 ******************************************************************************

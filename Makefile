@@ -71,6 +71,7 @@ Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart_ex.c \
 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_uart.c \
 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal.c \
 Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_can.c \
+Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_iwdg.c \
 Segger/SEGGER_RTT.c \
 Segger/SEGGER_RTT_printf.c  
 

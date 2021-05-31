@@ -189,7 +189,7 @@ static void checkUserButton(void)
         ndefDemoFeature %= NDEF_DEMO_MAX_FEATURES;
 
         ndefDemoPrevFeature = ndefDemoFeature;
-        SEGGER_RTT_printf(0,"%s\r\n", ndefDemoFeatureDescription[ndefDemoFeature]);
+        //SEGGER_RTT_printf(0,"%s\r\n", ndefDemoFeatureDescription[ndefDemoFeature]);
         /* Debounce button */
         while( platformGpioIsLow(PLATFORM_USER_BUTTON_PORT, PLATFORM_USER_BUTTON_PIN) );
         if( ndefDemoFeature != NDEF_DEMO_READ )
@@ -212,12 +212,12 @@ static void ndefShowDemoUsage()
 #if NDEF_FEATURE_ALL
     uint32_t i;
     
-    SEGGER_RTT_printf(0,"Use the User button to cycle among the different modes:\r\n");
+    //SEGGER_RTT_printf(0,"Use the User button to cycle among the different modes:\r\n");
     for (i = 0; i < SIZEOF_ARRAY(ndefDemoFeatureDescription); i++)
     {
-        SEGGER_RTT_printf(0,"%s\r\n", ndefDemoFeatureDescription[i]);
+        //SEGGER_RTT_printf(0,"%s\r\n", ndefDemoFeatureDescription[i]);
     }
-    SEGGER_RTT_printf(0,"In Write or Format mode (menu 2, 3 or 4), the demo returns to Read mode (menu 1) if no tag detected after %d seconds\r\n\n", NDEF_WRITE_FORMAT_TIMEOUT/1000);
+    //SEGGER_RTT_printf(0,"In Write or Format mode (menu 2, 3 or 4), the demo returns to Read mode (menu 1) if no tag detected after %d seconds\r\n\n", NDEF_WRITE_FORMAT_TIMEOUT/1000);
 #endif /* NDEF_FEATURE_ALL */
 }
 
@@ -314,14 +314,14 @@ bool get_data(uint8_t * id, uint8_t * data){
 
 	    /*if( (ndefDemoFeature != NDEF_DEMO_READ) && (platformTimerIsExpired(timer)) )
 	       {
-	           SEGGER_RTT_printf(0,"Timer expired, back to Read mode...\r\n");
+	           //SEGGER_RTT_printf(0,"Timer expired, back to Read mode...\r\n");
 	           ndefDemoFeature = NDEF_DEMO_READ;
 	       }
 
 	       if( ndefDemoFeature != ndefDemoPrevFeature )
 	       {
 	           ndefDemoPrevFeature = ndefDemoFeature;
-	           SEGGER_RTT_printf(0,"%s\r\n", ndefDemoFeatureDescription[ndefDemoFeature]);
+	           //SEGGER_RTT_printf(0,"%s\r\n", ndefDemoFeatureDescription[ndefDemoFeature]);
 	           ledsOff();
 	       }
 
@@ -386,29 +386,29 @@ bool get_data(uint8_t * id, uint8_t * data){
 	                              switch( nfcDevice->dev.nfca.type )
 	                              {
 	                                  case RFAL_NFCA_T1T:
-	                                      SEGGER_RTT_printf(0,"ISO14443A/Topaz (NFC-A T1T) TAG found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+	                                      //SEGGER_RTT_printf(0,"ISO14443A/Topaz (NFC-A T1T) TAG found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 	                                      //rfalNfcaPollerSleep();
 	                                      break;
 
 	                                  case RFAL_NFCA_T4T:
-	                                      SEGGER_RTT_printf(0,"NFCA Passive ISO-DEP device found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+	                                      //SEGGER_RTT_printf(0,"NFCA Passive ISO-DEP device found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 	                                      demoNdef(nfcDevice, data);
 	                                      //rfalIsoDepDeselect();
 	                                      break;
 
 	                                  case RFAL_NFCA_T4T_NFCDEP:
 	                                  case RFAL_NFCA_NFCDEP:
-	                                      SEGGER_RTT_printf(0,"NFCA Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+	                                      //SEGGER_RTT_printf(0,"NFCA Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 	                                      demoP2P();
 	                                      break;
 
 	                                  default:
-	                                      SEGGER_RTT_printf(0,"ISO14443A/NFC-A card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+	                                      //SEGGER_RTT_printf(0,"ISO14443A/NFC-A card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 
                                          /* for(int i = 0 ; i < nfcDevice->nfcidLen; i++)
                                           {
                                                 id[i] = (uint8_t)nfcDevice->nfcid[i];
-                                                SEGGER_RTT_printf(0,"id[%d]: 0x%02x \r\n", i, nfcDevice->nfcid[i] );
+                                                //SEGGER_RTT_printf(0,"id[%d]: 0x%02x \r\n", i, nfcDevice->nfcid[i] );
                                           }
                                           */
 
@@ -420,7 +420,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 	                              }
                                   rt = true;
 	                              /* Loop until tag is removed from the field */
-	                              SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
+	                              //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
 	                             /* while( rfalNfcaPollerCheckPresence(RFAL_14443A_SHORTFRAME_CMD_WUPA, &sensRes) == ERR_NONE )
 	                              {
 	                                  if( ((nfcDevice->dev.nfca.type == RFAL_NFCA_T1T) && (!rfalNfcaIsSensResT1T(&sensRes ))) ||
@@ -436,7 +436,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 	                          /*******************************************************************************/
 	                          case RFAL_NFC_LISTEN_TYPE_NFCB:
 
-	                              SEGGER_RTT_printf(0,"ISO14443B/NFC-B card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+	                              //SEGGER_RTT_printf(0,"ISO14443B/NFC-B card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 	                              //platformLedOn(PLATFORM_LED_B_PORT, PLATFORM_LED_B_PIN);
 
 	                              if( rfalNfcbIsIsoDepSupported( &nfcDevice->dev.nfcb ) )
@@ -449,7 +449,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 	                                  rfalNfcbPollerSleep(nfcDevice->dev.nfcb.sensbRes.nfcid0);
 	                              }
 	                              /* Loop until tag is removed from the field */
-	                              SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
+	                              //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
 	                              while( rfalNfcbPollerCheckPresence(RFAL_NFCB_SENS_CMD_ALLB_REQ, RFAL_NFCB_SLOT_NUM_1, &sensbRes, &sensbResLen) == ERR_NONE )
 	                              {
 	                                  if( ST_BYTECMP(sensbRes.nfcid0, nfcDevice->dev.nfcb.sensbRes.nfcid0, RFAL_NFCB_NFCID0_LEN) != 0 )
@@ -467,18 +467,18 @@ bool get_data(uint8_t * id, uint8_t * data){
 
 	                              if( rfalNfcfIsNfcDepSupported( &nfcDevice->dev.nfcf ) )
 	                              {
-	                                  SEGGER_RTT_printf(0,"NFCF Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+	                                  //SEGGER_RTT_printf(0,"NFCF Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 	                                  demoP2P();
 	                              }
 	                              else
 	                              {
-	                                  SEGGER_RTT_printf(0,"Felica/NFC-F card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
+	                                  //SEGGER_RTT_printf(0,"Felica/NFC-F card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
 	                                  demoNdef(nfcDevice, data);
 	                              }
 
 	                              //platformLedOn(PLATFORM_LED_F_PORT, PLATFORM_LED_F_PIN);
 	                              /* Loop until tag is removed from the field */
-	                              SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
+	                              //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
 	                              devCnt = 1;
 	                              while (rfalNfcfPollerPoll( RFAL_FELICA_1_SLOT, RFAL_NFCF_SYSTEMCODE, RFAL_FELICA_POLL_RC_NO_REQUEST, cardList, &devCnt, &collisions ) == ERR_NONE)
 	                              {
@@ -500,14 +500,14 @@ bool get_data(uint8_t * id, uint8_t * data){
 
 	                                  ST_MEMCPY( devUID, nfcDevice->nfcid, nfcDevice->nfcidLen );   /* Copy the UID into local var */
 	                                  REVERSE_BYTES( devUID, RFAL_NFCV_UID_LEN );                 /* Reverse the UID for display purposes */
-	                                  SEGGER_RTT_printf(0,"ISO15693/NFC-V card found. UID: %s\r\n", hex2Str(devUID, RFAL_NFCV_UID_LEN));
+	                                  //SEGGER_RTT_printf(0,"ISO15693/NFC-V card found. UID: %s\r\n", hex2Str(devUID, RFAL_NFCV_UID_LEN));
 
 	                                  //platformLedOn(PLATFORM_LED_V_PORT, PLATFORM_LED_V_PIN);
 
 	                                  demoNdef(nfcDevice, data);
 
 	                                  /* Loop until tag is removed from the field */
-	                                  SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
+	                                  //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
 	                                  while (rfalNfcvPollerInventory( RFAL_NFCV_NUM_SLOTS_1, RFAL_NFCV_UID_LEN * 8U, nfcDevice->dev.nfcv.InvRes.UID, &invRes, &rcvdLen) == ERR_NONE)
 	                                  {
 	                                      platformDelay(130);
@@ -519,7 +519,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 	                          /*******************************************************************************/
 	                          case RFAL_NFC_LISTEN_TYPE_ST25TB:
 
-	                              SEGGER_RTT_printf(0,"ST25TB card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
+	                              //SEGGER_RTT_printf(0,"ST25TB card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
 	                              //platformLedOn(PLATFORM_LED_B_PORT, PLATFORM_LED_B_PIN);
                                   rt = true;
 	                              break;
@@ -527,7 +527,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 	                          /*******************************************************************************/
 	                          case RFAL_NFC_LISTEN_TYPE_AP2P:
 
-	                              SEGGER_RTT_printf(0,"NFC Active P2P device found. NFCID3: %s\r\n", hex2Str(nfcDevice->nfcid, nfcDevice->nfcidLen));
+	                              //SEGGER_RTT_printf(0,"NFC Active P2P device found. NFCID3: %s\r\n", hex2Str(nfcDevice->nfcid, nfcDevice->nfcidLen));
 	                              //platformLedOn(PLATFORM_LED_AP2P_PORT, PLATFORM_LED_AP2P_PIN);
 
 	                              demoP2P();
@@ -587,14 +587,14 @@ bool get_data(uint8_t * id, uint8_t * data){
     
 //     if( (ndefDemoFeature != NDEF_DEMO_READ) && (platformTimerIsExpired(timer)) )
 //     {
-//         SEGGER_RTT_printf(0,"Timer expired, back to Read mode...\r\n");
+//         //SEGGER_RTT_printf(0,"Timer expired, back to Read mode...\r\n");
 //         ndefDemoFeature = NDEF_DEMO_READ;
 //     }
     
 //     if( ndefDemoFeature != ndefDemoPrevFeature )
 //     {
 //         ndefDemoPrevFeature = ndefDemoFeature;
-//         SEGGER_RTT_printf(0,"%s\r\n", ndefDemoFeatureDescription[ndefDemoFeature]);
+//         //SEGGER_RTT_printf(0,"%s\r\n", ndefDemoFeatureDescription[ndefDemoFeature]);
 //         ledsOff();
 //     }
     
@@ -658,30 +658,30 @@ bool get_data(uint8_t * id, uint8_t * data){
 //                         switch( nfcDevice->dev.nfca.type )
 //                         {
 //                             case RFAL_NFCA_T1T:
-//                                 SEGGER_RTT_printf(0,"ISO14443A/Topaz (NFC-A T1T) TAG found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+//                                 //SEGGER_RTT_printf(0,"ISO14443A/Topaz (NFC-A T1T) TAG found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 //                                 //rfalNfcaPollerSleep();
 //                                 break;
                             
 //                             case RFAL_NFCA_T4T:
-//                                 SEGGER_RTT_printf(0,"NFCA Passive ISO-DEP device found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+//                                 //SEGGER_RTT_printf(0,"NFCA Passive ISO-DEP device found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 //                                 demoNdef(nfcDevice);
 //                                 //rfalIsoDepDeselect();
 //                                 break;
                             
 //                             case RFAL_NFCA_T4T_NFCDEP:
 //                             case RFAL_NFCA_NFCDEP:
-//                                 SEGGER_RTT_printf(0,"NFCA Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+//                                 //SEGGER_RTT_printf(0,"NFCA Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 //                                 demoP2P();
 //                                 break;
                                 
 //                             default:
-//                                 SEGGER_RTT_printf(0,"ISO14443A/NFC-A card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+//                                 //SEGGER_RTT_printf(0,"ISO14443A/NFC-A card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 //                                 demoNdef(nfcDevice);
 //                                 //rfalNfcaPollerSleep();
 //                                 break;
 //                         }
 //                         /* Loop until tag is removed from the field */
-//                         SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
+//                         //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
 //                        /* while( rfalNfcaPollerCheckPresence(RFAL_14443A_SHORTFRAME_CMD_WUPA, &sensRes) == ERR_NONE )
 //                         {
 //                             if( ((nfcDevice->dev.nfca.type == RFAL_NFCA_T1T) && (!rfalNfcaIsSensResT1T(&sensRes ))) ||
@@ -697,7 +697,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 //                     /*******************************************************************************/
 //                     case RFAL_NFC_LISTEN_TYPE_NFCB:
                         
-//                         SEGGER_RTT_printf(0,"ISO14443B/NFC-B card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+//                         //SEGGER_RTT_printf(0,"ISO14443B/NFC-B card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 //                         platformLedOn(PLATFORM_LED_B_PORT, PLATFORM_LED_B_PIN);
                     
 //                         if( rfalNfcbIsIsoDepSupported( &nfcDevice->dev.nfcb ) )
@@ -710,7 +710,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 //                             rfalNfcbPollerSleep(nfcDevice->dev.nfcb.sensbRes.nfcid0);
 //                         }
 //                         /* Loop until tag is removed from the field */
-//                         SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
+//                         //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
 //                         while( rfalNfcbPollerCheckPresence(RFAL_NFCB_SENS_CMD_ALLB_REQ, RFAL_NFCB_SLOT_NUM_1, &sensbRes, &sensbResLen) == ERR_NONE )
 //                         {
 //                             if( ST_BYTECMP(sensbRes.nfcid0, nfcDevice->dev.nfcb.sensbRes.nfcid0, RFAL_NFCB_NFCID0_LEN) != 0 )
@@ -727,18 +727,18 @@ bool get_data(uint8_t * id, uint8_t * data){
                         
 //                         if( rfalNfcfIsNfcDepSupported( &nfcDevice->dev.nfcf ) )
 //                         {
-//                             SEGGER_RTT_printf(0,"NFCF Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
+//                             //SEGGER_RTT_printf(0,"NFCF Passive P2P device found. NFCID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
 //                             demoP2P();
 //                         }
 //                         else
 //                         {
-//                             SEGGER_RTT_printf(0,"Felica/NFC-F card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
+//                             //SEGGER_RTT_printf(0,"Felica/NFC-F card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
 //                             demoNdef(nfcDevice);
 //                         }
                         
 //                         platformLedOn(PLATFORM_LED_F_PORT, PLATFORM_LED_F_PIN);
 //                         /* Loop until tag is removed from the field */
-//                         SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
+//                         //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
 //                         devCnt = 1;
 //                         while (rfalNfcfPollerPoll( RFAL_FELICA_1_SLOT, RFAL_NFCF_SYSTEMCODE, RFAL_FELICA_POLL_RC_NO_REQUEST, cardList, &devCnt, &collisions ) == ERR_NONE)
 //                         {
@@ -759,14 +759,14 @@ bool get_data(uint8_t * id, uint8_t * data){
                             
 //                             ST_MEMCPY( devUID, nfcDevice->nfcid, nfcDevice->nfcidLen );   /* Copy the UID into local var */
 //                             REVERSE_BYTES( devUID, RFAL_NFCV_UID_LEN );                 /* Reverse the UID for display purposes */
-//                             SEGGER_RTT_printf(0,"ISO15693/NFC-V card found. UID: %s\r\n", hex2Str(devUID, RFAL_NFCV_UID_LEN));
+//                             //SEGGER_RTT_printf(0,"ISO15693/NFC-V card found. UID: %s\r\n", hex2Str(devUID, RFAL_NFCV_UID_LEN));
                         
 //                             platformLedOn(PLATFORM_LED_V_PORT, PLATFORM_LED_V_PIN);
                             
 //                             demoNdef(nfcDevice);
 
 //                             /* Loop until tag is removed from the field */
-//                             SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
+//                             //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
 //                             while (rfalNfcvPollerInventory( RFAL_NFCV_NUM_SLOTS_1, RFAL_NFCV_UID_LEN * 8U, nfcDevice->dev.nfcv.InvRes.UID, &invRes, &rcvdLen) == ERR_NONE)
 //                             {
 //                                 platformDelay(130);
@@ -777,14 +777,14 @@ bool get_data(uint8_t * id, uint8_t * data){
 //                     /*******************************************************************************/
 //                     case RFAL_NFC_LISTEN_TYPE_ST25TB:
                         
-//                         SEGGER_RTT_printf(0,"ST25TB card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
+//                         //SEGGER_RTT_printf(0,"ST25TB card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
 //                         platformLedOn(PLATFORM_LED_B_PORT, PLATFORM_LED_B_PIN);
 //                         break;
                     
 //                     /*******************************************************************************/
 //                     case RFAL_NFC_LISTEN_TYPE_AP2P:
                         
-//                         SEGGER_RTT_printf(0,"NFC Active P2P device found. NFCID3: %s\r\n", hex2Str(nfcDevice->nfcid, nfcDevice->nfcidLen));
+//                         //SEGGER_RTT_printf(0,"NFC Active P2P device found. NFCID3: %s\r\n", hex2Str(nfcDevice->nfcid, nfcDevice->nfcidLen));
 //                         platformLedOn(PLATFORM_LED_AP2P_PORT, PLATFORM_LED_AP2P_PIN);
                     
 //                         demoP2P();
@@ -833,14 +833,14 @@ void demoP2P( void )
     ndefRecord  record;
     ndefType    uri;
 
-    SEGGER_RTT_printf(0," Initalize device .. ");
+    //SEGGER_RTT_printf(0," Initalize device .. ");
     err = demoTransceiveBlocking( ndefInit, sizeof(ndefInit), &rxData, &rxLen, RFAL_FWT_NONE);
     if( err != ERR_NONE )
     {
-        SEGGER_RTT_printf(0,"failed.");
+        //SEGGER_RTT_printf(0,"failed.");
         return;
     }
-    SEGGER_RTT_printf(0,"succeeded.\r\n");
+    //SEGGER_RTT_printf(0,"succeeded.\r\n");
     
     err  = ndefRtdUri(&uri, NDEF_URI_PREFIX_HTTP_WWW, &bufURL);
     err |= ndefRtdUriToRecord(&uri, &record);
@@ -863,30 +863,30 @@ void demoP2P( void )
 
     if( err != ERR_NONE )
     {
-        SEGGER_RTT_printf(0,"NDEF message creation failed (%d)\r\n", err);
+        //SEGGER_RTT_printf(0,"NDEF message creation failed (%d)\r\n", err);
         return;
     }
 
     ndefBufferDump("URL converted to SNEP:\r\n", (ndefConstBuffer*)&bufPayload, true);
 
-    SEGGER_RTT_printf(0," Push NDEF Uri: www.st.com/st25-demo .. ");
+    //SEGGER_RTT_printf(0," Push NDEF Uri: www.st.com/st25-demo .. ");
     err = demoTransceiveBlocking(bufPayload.buffer, bufPayload.length, &rxData, &rxLen, RFAL_FWT_NONE);
     if( err != ERR_NONE )
     {
-        SEGGER_RTT_printf(0,"failed.");
+        //SEGGER_RTT_printf(0,"failed.");
         return;
     }
-    SEGGER_RTT_printf(0,"succeeded.\r\n");
+    //SEGGER_RTT_printf(0,"succeeded.\r\n");
 
 
-    SEGGER_RTT_printf(0," Device present, maintaining connection ");
+    //SEGGER_RTT_printf(0," Device present, maintaining connection ");
     while(err == ERR_NONE) 
     {
         err = demoTransceiveBlocking( ndefLLCPSYMM, sizeof(ndefLLCPSYMM), &rxData, &rxLen, RFAL_FWT_NONE);
-        SEGGER_RTT_printf(0,".");
+        //SEGGER_RTT_printf(0,".");
         platformDelay(50);
     }
-    SEGGER_RTT_printf(0,"\r\n Device removed.\r\n");
+    //SEGGER_RTT_printf(0,"\r\n Device removed.\r\n");
 }
 
 
@@ -964,7 +964,7 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
     err = ndefPollerContextInitialization(&ndefCtx, pNfcDevice);
     if( err != ERR_NONE )
     {
-        SEGGER_RTT_printf(0,"√)\r\n", err);
+        //SEGGER_RTT_printf(0,"√)\r\n", err);
         return;
     }
     
@@ -979,7 +979,7 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
     err = ndefPollerNdefDetect(&ndefCtx, &info);
     if( err != ERR_NONE )
     {
-        SEGGER_RTT_printf(0,"NDEF NOT DETECTED (ndefPollerNdefDetect returns %d)\r\n", err);
+        //SEGGER_RTT_printf(0,"NDEF NOT DETECTED (ndefPollerNdefDetect returns %d)\r\n", err);
         if( ndefDemoFeature != NDEF_DEMO_FORMAT_TAG)
         {
             return;
@@ -987,12 +987,12 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
     }
     else
     {
-        SEGGER_RTT_printf(0,"%s NDEF detected.\r\n", ndefStates[info.state]);
+        //SEGGER_RTT_printf(0,"%s NDEF detected.\r\n", ndefStates[info.state]);
         ndefCCDump(&ndefCtx);
 
         if( verbose )
         {
-            SEGGER_RTT_printf(0,"NDEF Len: %d, Offset=%d\r\n", ndefCtx.messageLen, ndefCtx.messageOffset);
+            //SEGGER_RTT_printf(0,"NDEF Len: %d, Offset=%d\r\n", ndefCtx.messageLen, ndefCtx.messageOffset);
         }
     }
 
@@ -1010,7 +1010,7 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
             err = ndefPollerReadRawMessage(&ndefCtx, rawMessageBuf, sizeof(rawMessageBuf), &rawMessageLen);
             if( err != ERR_NONE )
             {
-                SEGGER_RTT_printf(0,"NDEF message cannot be read (ndefPollerReadRawMessage returns %d)\r\n", err);
+                //SEGGER_RTT_printf(0,"NDEF message cannot be read (ndefPollerReadRawMessage returns %d)\r\n", err);
                 return;
             }
             if( verbose )
@@ -1025,13 +1025,13 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
             memcpy((uint8_t*)&data_out[0], (uint8_t*)&message.record->bufPayload.buffer[0], 8);
             if( err != ERR_NONE )
             {
-                SEGGER_RTT_printf(0,"NDEF message cannot be decoded (ndefMessageDecode  returns %d)\r\n", err);
+                //SEGGER_RTT_printf(0,"NDEF message cannot be decoded (ndefMessageDecode  returns %d)\r\n", err);
                 return;
             }
             err = ndefMessageDump(&message, verbose);
             if( err != ERR_NONE )
             {
-                SEGGER_RTT_printf(0,"NDEF message cannot be displayed (ndefMessageDump returns %d)\r\n", err);
+                //SEGGER_RTT_printf(0,"NDEF message cannot be displayed (ndefMessageDump returns %d)\r\n", err);
                 return;
             }
             break;
@@ -1054,16 +1054,16 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
             err |= ndefMessageAppend(&message, &record1); /* Append Text record to message */
             if( err != ERR_NONE )
             {
-                SEGGER_RTT_printf(0,"Message creation failed\r\n", err);
+                //SEGGER_RTT_printf(0,"Message creation failed\r\n", err);
                 return;
             }
             err = ndefPollerWriteMessage(&ndefCtx, &message); /* Write message */
             if( err != ERR_NONE )
             {
-                SEGGER_RTT_printf(0,"Message cannot be written (ndefPollerWriteMessage return %d)\r\n", err);
+                //SEGGER_RTT_printf(0,"Message cannot be written (ndefPollerWriteMessage return %d)\r\n", err);
                 return;
             }
-            SEGGER_RTT_printf(0,"Wrote 1 record to the Tag\r\n");
+            //SEGGER_RTT_printf(0,"Wrote 1 record to the Tag\r\n");
             if( verbose )
             {
                 /* Dump raw message */
@@ -1102,16 +1102,16 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
             err |= ndefMessageEncode(&message, &bufRawMessage); /* Encode the message to the raw buffer */
             if( err != ERR_NONE )
             {
-                SEGGER_RTT_printf(0,"Raw message creation failed (%d)\r\n", err);
+                //SEGGER_RTT_printf(0,"Raw message creation failed (%d)\r\n", err);
                 return;
             }
             err = ndefPollerWriteRawMessage(&ndefCtx, bufRawMessage.buffer, bufRawMessage.length);
             if( err != ERR_NONE )
             {
-                SEGGER_RTT_printf(0,"Message cannot be written (ndefPollerWriteRawMessage return %d)\r\n", err);
+                //SEGGER_RTT_printf(0,"Message cannot be written (ndefPollerWriteRawMessage return %d)\r\n", err);
                 return;
             }
-            SEGGER_RTT_printf(0,"Wrote 2 records to the Tag\r\n");
+            //SEGGER_RTT_printf(0,"Wrote 2 records to the Tag\r\n");
             if( verbose )
             {
                 /* Dump raw message */
@@ -1127,18 +1127,18 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
             ndefDemoFeature = NDEF_DEMO_READ;
             if( !ndefIsSTTag(&ndefCtx) )
             {
-                SEGGER_RTT_printf(0,"Manufacturer ID not found or not an ST tag. Format aborted \r\n");
+                //SEGGER_RTT_printf(0,"Manufacturer ID not found or not an ST tag. Format aborted \r\n");
                 return;
             }
-            SEGGER_RTT_printf(0,"Formatting Tag...\r\n");
+            //SEGGER_RTT_printf(0,"Formatting Tag...\r\n");
             /* Format Tag */
             err = ndefPollerTagFormat(&ndefCtx, NULL, 0);
             if( err != ERR_NONE )
             {
-                SEGGER_RTT_printf(0,"Tag cannot be formatted (ndefPollerTagFormat returns %d)\r\n", err);
+                //SEGGER_RTT_printf(0,"Tag cannot be formatted (ndefPollerTagFormat returns %d)\r\n", err);
                 return;
             }
-            SEGGER_RTT_printf(0,"Tag formatted\r\n");
+            //SEGGER_RTT_printf(0,"Tag formatted\r\n");
             LedNotificationWriteDone();
             break;
 #endif /* NDEF_FEATURE_ALL */
@@ -1154,7 +1154,7 @@ static void ndefT2TCCDump(ndefContext *ctx)
 {
     ndefConstBuffer bufCcBuf;
 
-    SEGGER_RTT_printf(0," * Magic: %2.2Xh Version: %d.%d Size: %d (%d bytes) \r\n * readAccess: %2.2xh writeAccess: %2.2xh \r\n", ctx->cc.t2t.magicNumber, ctx->cc.t2t.majorVersion, ctx->cc.t2t.minorVersion, ctx->cc.t2t.size, ctx->cc.t2t.size * 8U, ctx->cc.t2t.readAccess, ctx->cc.t2t.writeAccess);
+    //SEGGER_RTT_printf(0," * Magic: %2.2Xh Version: %d.%d Size: %d (%d bytes) \r\n * readAccess: %2.2xh writeAccess: %2.2xh \r\n", ctx->cc.t2t.magicNumber, ctx->cc.t2t.majorVersion, ctx->cc.t2t.minorVersion, ctx->cc.t2t.size, ctx->cc.t2t.size * 8U, ctx->cc.t2t.readAccess, ctx->cc.t2t.writeAccess);
     bufCcBuf.buffer = ctx->ccBuf;
     bufCcBuf.length = 4;
     ndefBufferDump(" CC Raw Data", &bufCcBuf, verbose);
@@ -1165,7 +1165,7 @@ static void ndefT3TAIBDump(ndefContext *ctx)
 {
     ndefConstBuffer bufCcBuf;
 
-    SEGGER_RTT_printf(0," * Version: %d.%d Size: %d (%d bytes) NbR: %d NbW: %d\r\n * WriteFlag: %2.2xh RWFlag: %2.2xh \r\n", ctx->cc.t3t.majorVersion, ctx->cc.t3t.minorVersion, ctx->cc.t3t.nMaxB, ctx->cc.t3t.nMaxB * 16U, ctx->cc.t3t.nbR, ctx->cc.t3t.nbW, ctx->cc.t3t.writeFlag, ctx->cc.t3t.rwFlag);
+    //SEGGER_RTT_printf(0," * Version: %d.%d Size: %d (%d bytes) NbR: %d NbW: %d\r\n * WriteFlag: %2.2xh RWFlag: %2.2xh \r\n", ctx->cc.t3t.majorVersion, ctx->cc.t3t.minorVersion, ctx->cc.t3t.nMaxB, ctx->cc.t3t.nMaxB * 16U, ctx->cc.t3t.nbR, ctx->cc.t3t.nbW, ctx->cc.t3t.writeFlag, ctx->cc.t3t.rwFlag);
     bufCcBuf.buffer = ctx->ccBuf;
     bufCcBuf.length = 16;
     ndefBufferDump(" CC Raw Data", &bufCcBuf, verbose);
@@ -1175,7 +1175,7 @@ static void ndefT4TCCDump(ndefContext *ctx)
 {
     ndefConstBuffer bufCcBuf;
     
-    SEGGER_RTT_printf(0," * CCLEN: %d T4T_VNo: %xh MLe: %d MLc: %d FileId: %2.2x%2.2xh FileSize: %d\r\n * readAccess: %2.2xh writeAccess: %2.2xh\r\n", ctx->cc.t4t.ccLen, ctx->cc.t4t.vNo, ctx->cc.t4t.mLe, ctx->cc.t4t.mLc, ctx->cc.t4t.fileId[0], ctx->cc.t4t.fileId[1],ctx->cc.t4t.fileSize, ctx->cc.t4t.readAccess, ctx->cc.t4t.writeAccess);
+    //SEGGER_RTT_printf(0," * CCLEN: %d T4T_VNo: %xh MLe: %d MLc: %d FileId: %2.2x%2.2xh FileSize: %d\r\n * readAccess: %2.2xh writeAccess: %2.2xh\r\n", ctx->cc.t4t.ccLen, ctx->cc.t4t.vNo, ctx->cc.t4t.mLe, ctx->cc.t4t.mLc, ctx->cc.t4t.fileId[0], ctx->cc.t4t.fileId[1],ctx->cc.t4t.fileSize, ctx->cc.t4t.readAccess, ctx->cc.t4t.writeAccess);
     bufCcBuf.buffer = ctx->ccBuf;
     bufCcBuf.length = ctx->cc.t4t.ccLen;
     ndefBufferDump(" CC File Raw Data", &bufCcBuf, verbose);
@@ -1185,11 +1185,11 @@ static void ndefT5TCCDump(ndefContext *ctx)
 {
     ndefConstBuffer bufCcBuf;
     
-    SEGGER_RTT_printf(0," * Block Length: %d\r\n", ctx->subCtx.t5t.blockLen);
-    SEGGER_RTT_printf(0," * %d bytes CC\r\n * Magic: %2.2Xh Version: %d.%d MLEN: %d (%d bytes) \r\n * readAccess: %2.2xh writeAccess: %2.2xh \r\n", ctx->cc.t5t.ccLen, ctx->cc.t5t.magicNumber, ctx->cc.t5t.majorVersion, ctx->cc.t5t.minorVersion, ctx->cc.t5t.memoryLen, ctx->cc.t5t.memoryLen * 8U, ctx->cc.t5t.readAccess, ctx->cc.t5t.writeAccess);
-    SEGGER_RTT_printf(0," * [%c] Special Frame\r\n",       ctx->cc.t5t.specialFrame ?      'X' : ' ');
-    SEGGER_RTT_printf(0," * [%c] Multiple block Read\r\n", ctx->cc.t5t.multipleBlockRead ? 'X' : ' ');
-    SEGGER_RTT_printf(0," * [%c] Lock Block\r\n",          ctx->cc.t5t.lockBlock ?         'X' : ' ');
+    //SEGGER_RTT_printf(0," * Block Length: %d\r\n", ctx->subCtx.t5t.blockLen);
+    //SEGGER_RTT_printf(0," * %d bytes CC\r\n * Magic: %2.2Xh Version: %d.%d MLEN: %d (%d bytes) \r\n * readAccess: %2.2xh writeAccess: %2.2xh \r\n", ctx->cc.t5t.ccLen, ctx->cc.t5t.magicNumber, ctx->cc.t5t.majorVersion, ctx->cc.t5t.minorVersion, ctx->cc.t5t.memoryLen, ctx->cc.t5t.memoryLen * 8U, ctx->cc.t5t.readAccess, ctx->cc.t5t.writeAccess);
+    //SEGGER_RTT_printf(0," * [%c] Special Frame\r\n",       ctx->cc.t5t.specialFrame ?      'X' : ' ');
+    //SEGGER_RTT_printf(0," * [%c] Multiple block Read\r\n", ctx->cc.t5t.multipleBlockRead ? 'X' : ' ');
+    //SEGGER_RTT_printf(0," * [%c] Lock Block\r\n",          ctx->cc.t5t.lockBlock ?         'X' : ' ');
     bufCcBuf.buffer = ctx->ccBuf;
     bufCcBuf.length = ctx->cc.t5t.ccLen;
     ndefBufferDump(" CC Raw Data", &bufCcBuf, verbose);
@@ -1201,7 +1201,7 @@ static void ndefCCDump(ndefContext *ctx)
     {
         return;
     }
-    SEGGER_RTT_printf(0,"%s", (ctx->device.type ==  RFAL_NFC_LISTEN_TYPE_NFCF) ? "NDEF Attribute Information Block\r\n" : "NDEF Capability Container\r\n");
+    //SEGGER_RTT_printf(0,"%s", (ctx->device.type ==  RFAL_NFC_LISTEN_TYPE_NFCF) ? "NDEF Attribute Information Block\r\n" : "NDEF Capability Container\r\n");
     switch( ctx->device.type )
     {
         case RFAL_NFC_LISTEN_TYPE_NFCA:
@@ -1246,48 +1246,48 @@ static void ndefDumpSysInfo(ndefContext *ctx)
     }
     
     sysInfo = &ctx->subCtx.t5t.sysInfo;
-    SEGGER_RTT_printf(0,"System Information\r\n");
-    SEGGER_RTT_printf(0," * %d byte(s) memory addressing\r\n", ndefT5TSysInfoMOIValue(sysInfo->infoFlags) + 1);
+    //SEGGER_RTT_printf(0,"System Information\r\n");
+    //SEGGER_RTT_printf(0," * %d byte(s) memory addressing\r\n", ndefT5TSysInfoMOIValue(sysInfo->infoFlags) + 1);
     if( ndefT5TSysInfoDFSIDPresent(sysInfo->infoFlags) )
     {
-        SEGGER_RTT_printf(0," * DFSID=%2.2Xh\r\n", sysInfo->DFSID);
+        //SEGGER_RTT_printf(0," * DFSID=%2.2Xh\r\n", sysInfo->DFSID);
     }
     if( ndefT5TSysInfoAFIPresent(sysInfo->infoFlags) )
     {
-        SEGGER_RTT_printf(0," * AFI=%2.2Xh\r\n", sysInfo->AFI);
+        //SEGGER_RTT_printf(0," * AFI=%2.2Xh\r\n", sysInfo->AFI);
     }
     if( ndefT5TSysInfoMemSizePresent(sysInfo->infoFlags) )
     {
-        SEGGER_RTT_printf(0," * %d blocks, %d bytes per block\r\n", sysInfo->numberOfBlock, sysInfo->blockSize);
+        //SEGGER_RTT_printf(0," * %d blocks, %d bytes per block\r\n", sysInfo->numberOfBlock, sysInfo->blockSize);
     }
     if( ndefT5TSysInfoICRefPresent(sysInfo->infoFlags) )
     {
-        SEGGER_RTT_printf(0," * ICRef=%2.2xh\r\n", sysInfo->ICRef);
+        //SEGGER_RTT_printf(0," * ICRef=%2.2xh\r\n", sysInfo->ICRef);
     }
     if( ndefT5TSysInfoCmdListPresent(sysInfo->infoFlags) )
     {
-        SEGGER_RTT_printf(0," * [%c] ReadSingleBlock                \r\n", ndefT5TSysInfoReadSingleBlockSupported(sysInfo->supportedCmd)                 ? 'X' : ' ');               
-        SEGGER_RTT_printf(0," * [%c] WriteSingleBlock               \r\n", ndefT5TSysInfoWriteSingleBlockSupported(sysInfo->supportedCmd)                ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] LockSingleBlock                \r\n", ndefT5TSysInfoLockSingleBlockSupported(sysInfo->supportedCmd)                 ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] ReadMultipleBlocks             \r\n", ndefT5TSysInfoReadMultipleBlocksSupported(sysInfo->supportedCmd)              ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] WriteMultipleBlocks            \r\n", ndefT5TSysInfoWriteMultipleBlocksSupported(sysInfo->supportedCmd)             ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] Select                         \r\n", ndefT5TSysInfoSelectSupported(sysInfo->supportedCmd)                          ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] ResetToReady                   \r\n", ndefT5TSysInfoResetToReadySupported(sysInfo->supportedCmd)                    ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] GetMultipleBlockSecStatus      \r\n", ndefT5TSysInfoGetMultipleBlockSecStatusSupported(sysInfo->supportedCmd)       ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] WriteAFI                       \r\n", ndefT5TSysInfoWriteAFISupported(sysInfo->supportedCmd)                        ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] LockAFI                        \r\n", ndefT5TSysInfoLockAFISupported(sysInfo->supportedCmd)                         ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] WriteDSFID                     \r\n", ndefT5TSysInfoWriteDSFIDSupported(sysInfo->supportedCmd)                      ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] LockDSFID                      \r\n", ndefT5TSysInfoLockDSFIDSupported(sysInfo->supportedCmd)                       ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] GetSystemInformation           \r\n", ndefT5TSysInfoGetSystemInformationSupported(sysInfo->supportedCmd)            ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] CustomCmds                     \r\n", ndefT5TSysInfoCustomCmdsSupported(sysInfo->supportedCmd)                      ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] FastReadMultipleBlocks         \r\n", ndefT5TSysInfoFastReadMultipleBlocksSupported(sysInfo->supportedCmd)          ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] ExtReadSingleBlock             \r\n", ndefT5TSysInfoExtReadSingleBlockSupported(sysInfo->supportedCmd)              ? 'X' : ' '); 
-        SEGGER_RTT_printf(0," * [%c] ExtWriteSingleBlock            \r\n", ndefT5TSysInfoExtWriteSingleBlockSupported(sysInfo->supportedCmd)             ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] ExtLockSingleBlock             \r\n", ndefT5TSysInfoExtLockSingleBlockSupported(sysInfo->supportedCmd)              ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] ExtReadMultipleBlocks          \r\n", ndefT5TSysInfoExtReadMultipleBlocksSupported(sysInfo->supportedCmd)           ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] ExtWriteMultipleBlocks         \r\n", ndefT5TSysInfoExtWriteMultipleBlocksSupported(sysInfo->supportedCmd)          ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] ExtGetMultipleBlockSecStatus   \r\n", ndefT5TSysInfoExtGetMultipleBlockSecStatusSupported(sysInfo->supportedCmd)    ? 'X' : ' ');
-        SEGGER_RTT_printf(0," * [%c] FastExtendedReadMultipleBlocks \r\n", ndefT5TSysInfoFastExtendedReadMultipleBlocksSupported(sysInfo->supportedCmd)  ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] ReadSingleBlock                \r\n", ndefT5TSysInfoReadSingleBlockSupported(sysInfo->supportedCmd)                 ? 'X' : ' ');               
+        //SEGGER_RTT_printf(0," * [%c] WriteSingleBlock               \r\n", ndefT5TSysInfoWriteSingleBlockSupported(sysInfo->supportedCmd)                ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] LockSingleBlock                \r\n", ndefT5TSysInfoLockSingleBlockSupported(sysInfo->supportedCmd)                 ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] ReadMultipleBlocks             \r\n", ndefT5TSysInfoReadMultipleBlocksSupported(sysInfo->supportedCmd)              ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] WriteMultipleBlocks            \r\n", ndefT5TSysInfoWriteMultipleBlocksSupported(sysInfo->supportedCmd)             ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] Select                         \r\n", ndefT5TSysInfoSelectSupported(sysInfo->supportedCmd)                          ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] ResetToReady                   \r\n", ndefT5TSysInfoResetToReadySupported(sysInfo->supportedCmd)                    ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] GetMultipleBlockSecStatus      \r\n", ndefT5TSysInfoGetMultipleBlockSecStatusSupported(sysInfo->supportedCmd)       ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] WriteAFI                       \r\n", ndefT5TSysInfoWriteAFISupported(sysInfo->supportedCmd)                        ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] LockAFI                        \r\n", ndefT5TSysInfoLockAFISupported(sysInfo->supportedCmd)                         ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] WriteDSFID                     \r\n", ndefT5TSysInfoWriteDSFIDSupported(sysInfo->supportedCmd)                      ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] LockDSFID                      \r\n", ndefT5TSysInfoLockDSFIDSupported(sysInfo->supportedCmd)                       ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] GetSystemInformation           \r\n", ndefT5TSysInfoGetSystemInformationSupported(sysInfo->supportedCmd)            ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] CustomCmds                     \r\n", ndefT5TSysInfoCustomCmdsSupported(sysInfo->supportedCmd)                      ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] FastReadMultipleBlocks         \r\n", ndefT5TSysInfoFastReadMultipleBlocksSupported(sysInfo->supportedCmd)          ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] ExtReadSingleBlock             \r\n", ndefT5TSysInfoExtReadSingleBlockSupported(sysInfo->supportedCmd)              ? 'X' : ' '); 
+        //SEGGER_RTT_printf(0," * [%c] ExtWriteSingleBlock            \r\n", ndefT5TSysInfoExtWriteSingleBlockSupported(sysInfo->supportedCmd)             ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] ExtLockSingleBlock             \r\n", ndefT5TSysInfoExtLockSingleBlockSupported(sysInfo->supportedCmd)              ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] ExtReadMultipleBlocks          \r\n", ndefT5TSysInfoExtReadMultipleBlocksSupported(sysInfo->supportedCmd)           ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] ExtWriteMultipleBlocks         \r\n", ndefT5TSysInfoExtWriteMultipleBlocksSupported(sysInfo->supportedCmd)          ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] ExtGetMultipleBlockSecStatus   \r\n", ndefT5TSysInfoExtGetMultipleBlockSecStatusSupported(sysInfo->supportedCmd)    ? 'X' : ' ');
+        //SEGGER_RTT_printf(0," * [%c] FastExtendedReadMultipleBlocks \r\n", ndefT5TSysInfoFastExtendedReadMultipleBlocksSupported(sysInfo->supportedCmd)  ? 'X' : ' ');
     }
     return;
 }

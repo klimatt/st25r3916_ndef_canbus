@@ -337,7 +337,7 @@ int     SEGGER_RTT_TerminalOut        (unsigned char TerminalId, const char* s);
 
 /*********************************************************************
 *
-*       RTT printf functions (require SEGGER_RTT_printf.c)
+*       RTT printf functions (require //SEGGER_RTT_printf.c)
 *
 **********************************************************************
 */

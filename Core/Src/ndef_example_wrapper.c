@@ -68,7 +68,7 @@ bool demoIni( void )
     if( platformGpioIsLow(PLATFORM_USER_BUTTON_PORT, PLATFORM_USER_BUTTON_PIN))
     {
         bWrite = !bWrite;
-        SEGGER_RTT_printf(0,"Write: %s\r\n", bWrite ? "ON": "OFF");
+        //SEGGER_RTT_printf(0,"Write: %s\r\n", bWrite ? "ON": "OFF");
         /* Debounce button */
         while( platformGpioIsLow(PLATFORM_USER_BUTTON_PORT, PLATFORM_USER_BUTTON_PIN) );
     }

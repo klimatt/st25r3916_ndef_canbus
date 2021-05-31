@@ -57,8 +57,8 @@ Revision: $Rev: 17697 $
 **********************************************************************
 */
 
-#ifndef SEGGER_RTT_PRINTF_BUFFER_SIZE
-  #define SEGGER_RTT_PRINTF_BUFFER_SIZE (64)
+#ifndef SEGGER_RTT_printf_BUFFER_SIZE
+  #define SEGGER_RTT_printf_BUFFER_SIZE (64)
 #endif
 
 #include <stdlib.h>
@@ -85,7 +85,7 @@ typedef struct {
   int   ReturnValue;
 
   unsigned RTTBufferIndex;
-} SEGGER_RTT_PRINTF_DESC;
+} SEGGER_RTT_printf_DESC;
 
 /*********************************************************************
 *
@@ -104,7 +104,7 @@ typedef struct {
 *
 *       _StoreChar
 */
-static void _StoreChar(SEGGER_RTT_PRINTF_DESC * p, char c) {
+static void _StoreChar(SEGGER_RTT_printf_DESC * p, char c) {
   unsigned Cnt;
 
   Cnt = p->Cnt;
@@ -129,7 +129,7 @@ static void _StoreChar(SEGGER_RTT_PRINTF_DESC * p, char c) {
 *
 *       _PrintUnsigned
 */
-static void _PrintUnsigned(SEGGER_RTT_PRINTF_DESC * pBufferDesc, unsigned v, unsigned Base, unsigned NumDigits, unsigned FieldWidth, unsigned FormatFlags) {
+static void _PrintUnsigned(SEGGER_RTT_printf_DESC * pBufferDesc, unsigned v, unsigned Base, unsigned NumDigits, unsigned FieldWidth, unsigned FormatFlags) {
   static const char _aV2C[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
   unsigned Div;
   unsigned Digit;
@@ -219,7 +219,7 @@ static void _PrintUnsigned(SEGGER_RTT_PRINTF_DESC * pBufferDesc, unsigned v, uns
 *
 *       _PrintInt
 */
-static void _PrintInt(SEGGER_RTT_PRINTF_DESC * pBufferDesc, int v, unsigned Base, unsigned NumDigits, unsigned FieldWidth, unsigned FormatFlags) {
+static void _PrintInt(SEGGER_RTT_printf_DESC * pBufferDesc, int v, unsigned Base, unsigned NumDigits, unsigned FieldWidth, unsigned FormatFlags) {
   unsigned Width;
   int Number;
 
@@ -316,15 +316,15 @@ static void _PrintInt(SEGGER_RTT_PRINTF_DESC * pBufferDesc, int v, unsigned Base
 */
 int SEGGER_RTT_vprintf(unsigned BufferIndex, const char * sFormat, va_list * pParamList) {
   char c;
-  SEGGER_RTT_PRINTF_DESC BufferDesc;
+  SEGGER_RTT_printf_DESC BufferDesc;
   int v;
   unsigned NumDigits;
   unsigned FormatFlags;
   unsigned FieldWidth;
-  char acBuffer[SEGGER_RTT_PRINTF_BUFFER_SIZE];
+  char acBuffer[SEGGER_RTT_printf_BUFFER_SIZE];
 
   BufferDesc.pBuffer        = acBuffer;
-  BufferDesc.BufferSize     = SEGGER_RTT_PRINTF_BUFFER_SIZE;
+  BufferDesc.BufferSize     = SEGGER_RTT_printf_BUFFER_SIZE;
   BufferDesc.Cnt            = 0u;
   BufferDesc.RTTBufferIndex = BufferIndex;
   BufferDesc.ReturnValue    = 0;

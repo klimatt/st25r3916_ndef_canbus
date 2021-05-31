@@ -224,10 +224,10 @@
     (ctx).fwt       = (uint32_t)(t);
 
 
-#define rfalLogE(...)             SEGGER_RTT_printf(0,__VA_ARGS__)        /*!< Macro for the error log method                  */
-#define rfalLogW(...)             SEGGER_RTT_printf(0,__VA_ARGS__)        /*!< Macro for the warning log method                */
-#define rfalLogI(...)             SEGGER_RTT_printf(0,__VA_ARGS__)        /*!< Macro for the info log method                   */
-#define rfalLogD(...)             SEGGER_RTT_printf(0,__VA_ARGS__)        /*!< Macro for the debug log method                  */
+#define rfalLogE(...)             //SEGGER_RTT_printf(0,__VA_ARGS__)        /*!< Macro for the error log method                  */
+#define rfalLogW(...)             //SEGGER_RTT_printf(0,__VA_ARGS__)        /*!< Macro for the warning log method                */
+#define rfalLogI(...)             //SEGGER_RTT_printf(0,__VA_ARGS__)        /*!< Macro for the info log method                   */
+#define rfalLogD(...)             //SEGGER_RTT_printf(0,__VA_ARGS__)        /*!< Macro for the debug log method                  */
 
 
 /*

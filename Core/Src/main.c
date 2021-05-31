@@ -27,7 +27,13 @@
 #include "st_errno.h"
 #include "rfal_rf.h"
 #include "rfal_analogConfig.h"
-#include "SEGGER_RTT.h"
+
+
+//#define RTT_ON;
+
+#ifdef RTT_ON
+  #include "SEGGER_RTT.h"
+#endif
 
 //#include "stm32l4xx_hal_can.h"
 
@@ -54,7 +60,7 @@
 uint8_t globalCommProtectCnt = 0;   /*!< Global Protection counter     */
 UART_HandleTypeDef hlogger;         /*!< Handler to the UART HW logger */
 CAN_HandleTypeDef hcan1;
-
+IWDG_HandleTypeDef hiwdg;
 /**
   * @}
   */ 
@@ -63,6 +69,7 @@ CAN_HandleTypeDef hcan1;
 void SystemClock_Config(void);
 static void MX_CAN1_Init(void);
 static void gpio_can_init(void);
+static void MX_IWDG_Init(void);
 
 
 void can_irq(CAN_HandleTypeDef *pcan) {
@@ -251,8 +258,6 @@ HAL_StatusTypeDef can_init(CAN_HandleTypeDef *hcan)
   );
 
   //WRITE_REG(hcan->Instance->BTR, (uint32_t)0x41320009);
-
-  SEGGER_RTT_printf(0,"BTR: 0x%08x \r\n", READ_REG(hcan->Instance->BTR));
   /* Initialize the error code */
   hcan->ErrorCode = HAL_CAN_ERROR_NONE;
 
@@ -339,7 +344,6 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
         ((tsr & CAN_TSR_TME1) != 0U) ||
         ((tsr & CAN_TSR_TME2) != 0U))
     {
-       SEGGER_RTT_printf(0,"CAN_TSR_REG: 0x%08x \r\n", tsr);
       /* Select an empty transmit mailbox */
       transmitmailbox = (tsr & CAN_TSR_CODE) >> CAN_TSR_CODE_Pos;
 
@@ -391,10 +395,6 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
 
       /* Request transmission */
       SET_BIT(hcan->Instance->sTxMailBox[transmitmailbox].TIR, CAN_TI0R_TXRQ);
-      SEGGER_RTT_printf(0,"CAN_SEND rqTX\r\n");
-      SEGGER_RTT_printf(0,"TDHR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TDHR));
-      SEGGER_RTT_printf(0,"TDLR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TDLR));
-      SEGGER_RTT_printf(0,"TIR: 0x%08x \r\n", READ_REG(hcan->Instance->sTxMailBox[transmitmailbox].TIR));
       /* Return function status */
       return HAL_OK;
     }
@@ -454,7 +454,7 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
 #define ERROR_LED GPIO_PIN_3
 #define STATE_LED GPIO_PIN_4
 #define LEDS_PORT GPIOA
-const uint32_t CNT_LIMIT = 8000000;
+const uint32_t CNT_LIMIT = 40000;
 
 int main(void)
 {
@@ -467,11 +467,14 @@ int main(void)
              handled in milliseconds basis.
        - Low Level Initialization
      */
-  SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
+  #ifdef RTT_ON
+    SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
+  #endif
   HAL_Init();
 
   /* Configure the System clock to have a frequency of 80 MHz */
   SystemClock_Config();
+  MX_IWDG_Init();
 
    //gpio_can_init();
    //logUsartInit(&hlogger);
@@ -498,8 +501,9 @@ int main(void)
 #endif /* RFAL_USE_I2C */  
   /* Initialize log module */
   
-  
-  SEGGER_RTT_printf(0,"Welcome to X-NUCLEO-NFC06A1 + CAN-Bus\r\n");
+   #ifdef RTT_ON
+    SEGGER_RTT_printf(0,"Welcome to X-NUCLEO-NFC06A1 + CAN-Bus\r\n");
+   #endif
   
   //MX_GPIO_Init();
  
@@ -512,12 +516,16 @@ int main(void)
     * in case the rfal initalization failed signal it by flashing all LED
     * and stoping all operations
     */
-    SEGGER_RTT_printf(0,"Initialization failed..\r\n");
+    #ifdef RTT_ON
+      SEGGER_RTT_printf(0,"Initialization failed..\r\n");
+    #endif
     Error_Handler();
   } 
   else
   {
-    SEGGER_RTT_printf(0,"Initialization succeeded..\r\n");
+    #ifdef RTT_ON
+      SEGGER_RTT_printf(0,"Initialization succeeded..\r\n");
+    #endif
     HAL_GPIO_TogglePin(LEDS_PORT, ERROR_LED);
     HAL_GPIO_TogglePin(LEDS_PORT, STATE_LED);
     HAL_Delay(100);
@@ -534,7 +542,9 @@ int main(void)
   sf.FilterScale = CAN_FILTERSCALE_32BIT;
   sf.FilterActivation = CAN_FILTER_ENABLE;
   if (HAL_CAN_ConfigFilter(&hcan1, &sf) != HAL_OK) {
-    SEGGER_RTT_printf(0,"CAN_Filter config Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    #ifdef RTT_ON
+      SEGGER_RTT_printf(0,"CAN_Filter config Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    #endif
     Error_Handler();
   }
 
@@ -560,11 +570,15 @@ int main(void)
 
   
   if (HAL_CAN_Start(&hcan1) != HAL_OK) {
-    SEGGER_RTT_printf(0,"CAN_Start Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    #ifdef RTT_ON
+      SEGGER_RTT_printf(0,"CAN_Start Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    #endif
      Error_Handler();
   }
   if (HAL_CAN_WakeUp (&hcan1) != HAL_OK) {
-    SEGGER_RTT_printf(0,"CAN_Wakeup Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    #ifdef RTT_ON
+      SEGGER_RTT_printf(0,"CAN_Wakeup Fail: 0x%08x \r\n", hcan1.ErrorCode);
+    #endif
      Error_Handler();
   }
   rfalNfcDevice nfcDevice;
@@ -572,19 +586,36 @@ int main(void)
   uint8_t id[10] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
   while (1)
   { 
+   HAL_IWDG_Refresh(&hiwdg);
    if (get_data(&id, &data))
     {
       counter = 0;
-      HAL_GPIO_TogglePin(LEDS_PORT, STATE_LED);
-      SEGGER_RTT_printf(0,"nfcidLen: %d \r\n", nfcDevice.nfcidLen);
+      HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_SET);
+      HAL_Delay(10);
+      HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_RESET);
+      #ifdef RTT_ON
+        SEGGER_RTT_printf(0,"nfcidLen: %d \r\n", nfcDevice.nfcidLen);
+      #endif
       msg.ExtId = CAN_ID;
       msg.DLC = 7;
-      SEGGER_RTT_printf(0,"CAN_State: 0x%08x \r\n", HAL_CAN_GetState(&hcan1));
+      #ifdef RTT_ON
+        SEGGER_RTT_printf(0,"CAN_State: 0x%08x \r\n", HAL_CAN_GetState(&hcan1));
+      #endif
       if (can_send(&hcan1, &msg, id, &mb) != HAL_OK) {
-        SEGGER_RTT_printf(0,"CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
-          //Error_Handler();
+        #ifdef RTT_ON
+          SEGGER_RTT_printf(0,"CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
+        #endif
+        Error_Handler();
       }
     }
+    if (counter == CNT_LIMIT)
+    {
+      HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_SET);
+      HAL_Delay(10);
+      HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_RESET);
+      counter = 0;
+    }
+    counter++;
   }
 }
 
@@ -633,7 +664,6 @@ static void MX_CAN1_Init(void)
   hcan1.Init.TransmitFifoPriority = DISABLE;
   if (can_init(&hcan1) != HAL_OK)
   {
-    SEGGER_RTT_printf(0,"CAN_INIT Fail: 0x%08x \r\n", hcan1.ErrorCode);
     Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
@@ -688,6 +718,30 @@ static void gpio_can_init()
   /* USER CODE BEGIN CAN1_MspInit 1 */
 
   /* USER CODE END CAN1_MspInit 1 */
+
+}
+
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
+  hiwdg.Init.Window = 4095;
+  hiwdg.Init.Reload = 4095;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
 
 }
 
