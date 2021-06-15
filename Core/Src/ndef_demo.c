@@ -157,7 +157,7 @@ static bool                 ledOn;
 ******************************************************************************
 */
 
-static void demoNdef(rfalNfcDevice *nfcDevice, uint8_t * data);
+static void demoNdef(rfalNfcDevice *nfcDevice, uint8_t * data_out, uint8_t * data_len);
 static void ndefCCDump(ndefContext *ctx);
 static void ndefDumpSysInfo(ndefContext *ctx);
 
@@ -291,7 +291,7 @@ bool demoIni( void )
 
 
 
-bool get_data(uint8_t * id, uint8_t * data){
+bool get_data(uint8_t * id, uint8_t * data, uint8_t * id_len, uint8_t * data_len, uint16_t * rssi){
 	static rfalNfcDevice *nfcDevice;
 
 	    rfalNfcaSensRes       sensRes;
@@ -307,6 +307,8 @@ bool get_data(uint8_t * id, uint8_t * data){
 
 	    rfalNfcvInventoryRes  invRes;
 	    uint16_t              rcvdLen;
+
+      uint16_t r_code = 0;
 
 	    rfalNfcWorker();                                    /* Run RFAL worker periodically */
 
@@ -377,6 +379,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 	                      ledsOff();
 	                      platformDelay(50);
 	                      ndefDemoPrevFeature = 0xFF; /* Force the display of the prompt */
+                        r_code = rfalGetTransceiveRSSI( rssi );
 	                      switch( nfcDevice->type )
 	                      {
 	                          /*******************************************************************************/
@@ -392,7 +395,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 
 	                                  case RFAL_NFCA_T4T:
 	                                      //SEGGER_RTT_printf(0,"NFCA Passive ISO-DEP device found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ) );
-	                                      demoNdef(nfcDevice, data);
+	                                      demoNdef(nfcDevice, data, data_len);
 	                                      //rfalIsoDepDeselect();
 	                                      break;
 
@@ -410,10 +413,10 @@ bool get_data(uint8_t * id, uint8_t * data){
                                                 id[i] = (uint8_t)nfcDevice->nfcid[i];
                                                 //SEGGER_RTT_printf(0,"id[%d]: 0x%02x \r\n", i, nfcDevice->nfcid[i] );
                                           }
-                                          */
-
+                                          */                                          
                                           memcpy((uint8_t*)&id[0], (uint8_t*)&nfcDevice->nfcid[0], nfcDevice->nfcidLen);
-	                                      demoNdef(nfcDevice, data);
+                                          *id_len = nfcDevice->nfcidLen;
+	                                        demoNdef(nfcDevice, data, data_len);
                                           //demoP2P();
 	                                      //rfalNfcaPollerSleep();
 	                                      break;
@@ -441,7 +444,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 
 	                              if( rfalNfcbIsIsoDepSupported( &nfcDevice->dev.nfcb ) )
 	                              {
-	                                  demoNdef(nfcDevice, data);
+	                                  demoNdef(nfcDevice, data, data_len);
 	                                  rfalIsoDepDeselect();
 	                              }
 	                              else
@@ -473,7 +476,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 	                              else
 	                              {
 	                                  //SEGGER_RTT_printf(0,"Felica/NFC-F card found. UID: %s\r\n", hex2Str( nfcDevice->nfcid, nfcDevice->nfcidLen ));
-	                                  demoNdef(nfcDevice, data);
+	                                  demoNdef(nfcDevice, data, data_len);
 	                              }
 
 	                              //platformLedOn(PLATFORM_LED_F_PORT, PLATFORM_LED_F_PIN);
@@ -504,7 +507,7 @@ bool get_data(uint8_t * id, uint8_t * data){
 
 	                                  //platformLedOn(PLATFORM_LED_V_PORT, PLATFORM_LED_V_PIN);
 
-	                                  demoNdef(nfcDevice, data);
+	                                  demoNdef(nfcDevice, data, data_len);
 
 	                                  /* Loop until tag is removed from the field */
 	                                  //SEGGER_RTT_printf(0,"Operation completed\r\nTag can be removed from the field\r\n");
@@ -934,7 +937,7 @@ ReturnCode demoTransceiveBlocking( uint8_t *txBuf, uint16_t txBufSize, uint8_t *
     return err;
 }
 
-static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
+static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out, uint8_t * data_len)
 {
     ReturnCode       err;
     ndefMessage      message;
@@ -1022,7 +1025,9 @@ static void demoNdef(rfalNfcDevice *pNfcDevice, uint8_t * data_out)
             bufConstRawMessage.buffer = rawMessageBuf;
             bufConstRawMessage.length = rawMessageLen;
             err = ndefMessageDecode(&bufConstRawMessage, &message);
-            memcpy((uint8_t*)&data_out[0], (uint8_t*)&message.record->bufPayload.buffer[0], 8);
+
+            memcpy((uint8_t*)&data_out[0], (uint8_t*)&rawMessageBuf[7], rawMessageLen - 7); //8
+            *data_len = rawMessageLen - 7;
             if( err != ERR_NONE )
             {
                 //SEGGER_RTT_printf(0,"NDEF message cannot be decoded (ndefMessageDecode  returns %d)\r\n", err);

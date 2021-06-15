@@ -35,6 +35,8 @@
   #include "SEGGER_RTT.h"
 #endif
 
+//#include "SEGGER_RTT.h"
+
 //#include "stm32l4xx_hal_can.h"
 
 
@@ -475,6 +477,7 @@ int main(void)
   /* Configure the System clock to have a frequency of 80 MHz */
   SystemClock_Config();
   MX_IWDG_Init();
+  HAL_IWDG_Refresh(&hiwdg);
 
    //gpio_can_init();
    //logUsartInit(&hlogger);
@@ -492,6 +495,7 @@ int main(void)
   /* Configure Led pin Output Level as off */
   HAL_GPIO_WritePin(LEDS_PORT, ERROR_LED, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_RESET);
+  HAL_IWDG_Refresh(&hiwdg);
 
   //BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
 #ifdef RFAL_USE_I2C
@@ -547,6 +551,7 @@ int main(void)
     #endif
     Error_Handler();
   }
+  HAL_IWDG_Refresh(&hiwdg);
 
   /*if (HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can_irq)) {
     Error_Handler();
@@ -558,7 +563,7 @@ int main(void)
 
   uint32_t mb;
   CAN_TxHeaderTypeDef msg;
-  uint8_t data[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  
 
   
   msg.IDE = CAN_ID_EXT;
@@ -583,25 +588,59 @@ int main(void)
   }
   rfalNfcDevice nfcDevice;
   /* Infinite loop */
-  uint8_t id[10] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
+  uint8_t data[128] = { 0 };
+  uint8_t id[128] = { 0 };
+  uint8_t data_len = 0, id_len = 0;
+  uint16_t rssi = 0;
   while (1)
   { 
    HAL_IWDG_Refresh(&hiwdg);
-   if (get_data(&id, &data))
+   if (get_data(&id, &data, &id_len, &data_len, &rssi))
     {
       counter = 0;
       HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_SET);
       HAL_Delay(10);
       HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_RESET);
       #ifdef RTT_ON
-        SEGGER_RTT_printf(0,"nfcidLen: %d \r\n", nfcDevice.nfcidLen);
+        SEGGER_RTT_printf(0,"=============== \r\n");
+        SEGGER_RTT_printf(0,"id_len: %d \r\n", id_len);
+        for(uint8_t i = 0; i < id_len; i++){
+          SEGGER_RTT_printf(0,"id[%d]: 0x%2x \r\n", i, id[i]);
+        }
+        SEGGER_RTT_printf(0,"data_len: %d \r\n", data_len);
+        for(uint8_t i = 0; i < data_len; i++){
+          SEGGER_RTT_printf(0,"data[%d]: 0x%2x \r\n", i, data[i]);
+        }
+        SEGGER_RTT_printf(0,"=============== \r\n");
       #endif
-      msg.ExtId = CAN_ID;
-      msg.DLC = 7;
       #ifdef RTT_ON
         SEGGER_RTT_printf(0,"CAN_State: 0x%08x \r\n", HAL_CAN_GetState(&hcan1));
       #endif
-      if (can_send(&hcan1, &msg, id, &mb) != HAL_OK) {
+
+
+      int16_t value_from_ascii = atoi((char*)&data[0]);
+      uint8_t buff_to_send[4];
+      memcpy((uint8_t*)&buff_to_send[0], (uint8_t*)&value_from_ascii, 2);
+      memcpy((uint8_t*)&buff_to_send[2], (uint8_t*)&rssi, 2);
+
+      #ifdef RTT_ON
+        SEGGER_RTT_printf(0,"int val: %d :: 0x%2x\r\n", value_from_ascii, value_from_ascii);
+        SEGGER_RTT_printf(0,"RSSI: %d\r\n", rssi);
+      #endif
+       
+      for(uint8_t i = 0; i < 128; i++) {
+        data[i] = 0;
+        id[i] = 0;
+      }
+      data_len = 0;
+      id_len = 0;
+      rssi = 0;
+
+      msg.ExtId = CAN_ID;
+      msg.DLC = 4;  
+
+      if (can_send(&hcan1, &msg, buff_to_send, &mb) != HAL_OK) {
         #ifdef RTT_ON
           SEGGER_RTT_printf(0,"CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
         #endif

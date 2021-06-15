@@ -57,7 +57,7 @@ extern "C" {
  */
 bool demoIni( void );
 extern void demoCycle(void);
-extern bool get_data(uint8_t * id, uint8_t * data);
+extern bool get_data(uint8_t * id, uint8_t * data, uint8_t * id_len, uint8_t * data_len, uint16_t * rssi);
 /**
   * @}
   */
