@@ -648,7 +648,7 @@ int main(void)
         #ifdef RTT_ON
           SEGGER_RTT_printf(0,"CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
         #endif
-        Error_Handler();
+        //Error_Handler();
       }
     }
     if (counter == CNT_LIMIT)
@@ -661,7 +661,7 @@ int main(void)
         #ifdef RTT_ON
           SEGGER_RTT_printf(0,"CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
         #endif
-        Error_Handler();
+        //Error_Handler();
       }
       counter = 0;
     }
