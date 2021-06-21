@@ -29,7 +29,7 @@
 #include "rfal_analogConfig.h"
 
 
-//#define RTT_ON;
+#define RTT_ON;
 
 #ifdef RTT_ON
   #include "SEGGER_RTT.h"
@@ -432,25 +432,29 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
   */
 
 
-//#define NFC_TL
+#define NFC_TL
 //#define NFC_TR 
 //#define NFC_BL 
-#define NFC_BR
+//#define NFC_BR
 
 #ifdef NFC_TL
   uint32_t CAN_ID = 0x1000a00a;
+  uint32_t HB_ID = 0x1002bc0a;
 #endif
 
 #ifdef NFC_TR
   uint32_t CAN_ID = 0x1000a10a;
+  uint32_t HB_ID = 0x1002bd0a;
 #endif
 
 #ifdef NFC_BL
   uint32_t CAN_ID = 0x1000a20a;
+  uint32_t HB_ID = 0x1002be0a;
 #endif
 
 #ifdef NFC_BR
   uint32_t CAN_ID = 0x1000a30a;
+  uint32_t HB_ID = 0x1002bf0a;
 #endif
 
 #define ERROR_LED GPIO_PIN_3
@@ -470,7 +474,7 @@ int main(void)
        - Low Level Initialization
      */
   #ifdef RTT_ON
-    SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
+    SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
   #endif
   HAL_Init();
 
@@ -651,9 +655,17 @@ int main(void)
     {
       HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_SET);
       HAL_Delay(10);
-      HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_RESET);
+      msg.ExtId = HB_ID;
+      msg.DLC = 0;  
+      if (can_send(&hcan1, &msg, NULL, &mb) != HAL_OK) {
+        #ifdef RTT_ON
+          SEGGER_RTT_printf(0,"CAN_SEND Fail: 0x%08x \r\n", hcan1.ErrorCode);
+        #endif
+        Error_Handler();
+      }
       counter = 0;
     }
+    HAL_GPIO_WritePin(LEDS_PORT, STATE_LED, GPIO_PIN_RESET);
     counter++;
   }
 }
