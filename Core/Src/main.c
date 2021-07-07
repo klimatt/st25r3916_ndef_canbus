@@ -432,10 +432,10 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
   */
 
 
-#define NFC_TL
+//#define NFC_TL
 //#define NFC_TR 
 //#define NFC_BL 
-//#define NFC_BR
+#define NFC_BR
 
 #ifdef NFC_TL
   uint32_t CAN_ID = 0x1000a00a;
@@ -542,11 +542,11 @@ int main(void)
   }
 
   CAN_FilterTypeDef sf;
-  sf.FilterMaskIdHigh = (uint16_t)(CAN_ID >> 16);
-  sf.FilterMaskIdLow = (uint16_t)(CAN_ID);
+  sf.FilterMaskIdHigh = (uint16_t)(0);
+  sf.FilterMaskIdLow = (uint16_t)(0);
   sf.FilterFIFOAssignment = CAN_FILTER_FIFO0;
   sf.FilterBank = 0;
-  sf.FilterMode = CAN_FILTERMODE_IDLIST;
+  sf.FilterMode = CAN_FILTERMODE_IDMASK;
   sf.FilterScale = CAN_FILTERSCALE_32BIT;
   sf.FilterActivation = CAN_FILTER_ENABLE;
   if (HAL_CAN_ConfigFilter(&hcan1, &sf) != HAL_OK) {
