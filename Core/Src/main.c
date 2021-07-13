@@ -254,7 +254,7 @@ HAL_StatusTypeDef can_init(CAN_HandleTypeDef *hcan)
     hcan->Init.SyncJumpWidth << 24 |
     hcan->Init.TimeSeg2 << 20 |
     hcan->Init.TimeSeg1 << 16 |
-    hcan->Init.Prescaler
+    (hcan->Init.Prescaler - 1U)
   )
   
   );
@@ -460,7 +460,7 @@ HAL_StatusTypeDef can_send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader
 #define ERROR_LED GPIO_PIN_3
 #define STATE_LED GPIO_PIN_4
 #define LEDS_PORT GPIOA
-const uint32_t CNT_LIMIT = 40000;
+const uint32_t CNT_LIMIT = 30000;
 
 int main(void)
 {
@@ -702,11 +702,11 @@ static void MX_CAN1_Init(void)
 
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 5;
+  hcan1.Init.Prescaler = 2;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
-  hcan1.Init.SyncJumpWidth = 1;
-  hcan1.Init.TimeSeg1 = 2;
-  hcan1.Init.TimeSeg2 = 3;
+  hcan1.Init.SyncJumpWidth = 0; // -1
+  hcan1.Init.TimeSeg1 = 7; // -1
+  hcan1.Init.TimeSeg2 = 0; // -1
   hcan1.Init.TimeTriggeredMode = DISABLE;
   hcan1.Init.AutoBusOff = ENABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
@@ -760,6 +760,13 @@ static void gpio_can_init()
     GPIO_InitStruct.Alternate = GPIO_AF9_CAN1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+
+    /*  GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);*/
 
     /* CAN1 interrupt Init */
     /*HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 0, 0);
